@@ -154,5 +154,35 @@
 			$tree = implode('-', $tree);
 			return $this->getLastIdFromTree($tree);
 		}
+		
+		/**
+		 * Compares two folders by their place in the folder tree.
+		 * @param SimpleFolder $a The first folder.
+		 * @param SimpleFolder $b The second folder.
+		 * @author Björn Hjortsten
+		 * @return int Returns < 0 if $a is less than $b; > 0 if $a  is greater than $b, and 0 if they are equal. 
+		 */
+		protected static function compareByTree(SimpleFolder $a, SimpleFolder $b) {
+			$treeA = explode('-', $a->getTree());
+			$treeB = explode('-', $b->getTree());
+			for ($i = 0; $i < count($treeA) && $i < count($treeB); $i++) {
+				// If the node value is equal...
+				if (intval($treeA[$i], 16) == intval($treeB[$i], 16)) {
+					// ...and at the end of either node tree, compare tree length...
+					if ($i == (count($treeA) - 1) || $i == (count($treeB) - 1)) {
+						// ...If they are equal, return 0
+						if (count($treeA) == count($treeB)) {
+							return 0;
+						}
+						// ...If not equal, shortest tree wins
+						return (count($treeA) < count($treeB)) ? -1 : 1;
+					}
+					// ...and not at the end of either tree, continue
+					continue;
+				}
+				// If the node value is not equal, compare values 
+				return (intval($treeA[$i], 16) < intval($treeB[$i], 16)) ? -1 : 1;
+			}
+		}
 	}
 ?>
