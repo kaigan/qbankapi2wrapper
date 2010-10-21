@@ -1,10 +1,11 @@
 <?php
-	require_once 'SimpleFolder.php';
+	require_once 'model/SimpleFolder.php';
 	require_once 'exceptions/FolderException.php';
 	
 	/**
 	 * Represents a QBank folder.
 	 * @author Björn Hjortsten
+	 * @copyright Kaigan TBK 2010
 	 */
 	class Folder extends SimpleFolder {
 		

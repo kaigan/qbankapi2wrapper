@@ -1,9 +1,10 @@
 <?php
-	require_once 'PropertyValueType.php';
+	require_once 'model/PropertyValueType.php';
 	
 	/**
 	 * Represents a QBank property.
 	 * @author Björn Hjortsten
+	 * @copyright Kaigan TBK 2010
 	 */
 	class Property {
 		protected $id;
