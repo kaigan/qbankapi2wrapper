@@ -1,4 +1,5 @@
 <?php
+	require_once 'model/IHasProperties.php';
 	require_once 'model/SimpleFolder.php';
 	require_once 'exceptions/FolderException.php';
 	
@@ -7,7 +8,7 @@
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
 	 */
-	class Folder extends SimpleFolder {
+	class Folder extends SimpleFolder implements IHasProperties {
 		
 		/**
 		 * An array of {@link Folder}s. This folders subfolders.
@@ -117,7 +118,7 @@
 		
 		/**
 		 * Adds several properties to the folder.
-		 * @param array $properties An array of {@link Property}(ies) to be added as subfolder.
+		 * @param array $properties An array of {@link Property}(ies) to be added to the folder.
 		 * @author Björn Hjortsten
 		 * @return void
 		 */
@@ -131,7 +132,7 @@
 		
 		/**
 		 * Sets all the properties of the folder.
-		 * @param array $properties An array of {@link Property}(ies) to be added as subfolder.
+		 * @param array $properties An array of {@link Property}(ies) to be added to the folder.
 		 * @author Björn Hjortsten
 		 * @return void
 		 */
@@ -164,7 +165,7 @@
 						return $property;
 					}
 				}
-				throw new PropertyException(sprintf('No such property with system name %d', $identifier));
+				throw new PropertyException(sprintf('No such property with id %d', $identifier));
 			} else {
 				if (!isset($this->properties[$identifier])) {
 					throw new PropertyException(sprintf('No such property with system name %s.', $identifier));

@@ -21,7 +21,7 @@
 		 * @return QBankAPI
 		 */
 		public function __construct($qbankAddress) {
-			session_start();
+			@session_start();
 			$this->qbankAddress = $qbankAddress;
 			$this->curlHandle = curl_init();
 			$this->requestTimeout = 10;

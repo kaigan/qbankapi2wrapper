@@ -7,15 +7,86 @@
 	 * @copyright Kaigan TBK 2010
 	 */
 	class Property {
+		
+		/**
+		 * The id of the property.
+		 * @var int
+		 */
 		protected $id;
+		
+		/**
+		 * The id of the propertys type.
+		 * @var int
+		 */
 		protected $propertyTypeId;
+		
+		/**
+		 * The system name of the property.
+		 * @var string
+		 */
 		protected $systemName;
+		
+		/**
+		 * The display name of the property.
+		 * @var string
+		 */
 		protected $title;
+		
+		/**
+		 * If the user should be able to modify the property value.
+		 * @internal Probably not used at all.
+		 * @var bool
+		 */
 		protected $editable;
+		
+		/**
+		 * The type of the propertys value and default value.
+		 * @var PropertyValueType
+		 */
 		protected $propertyValueType;
+		
+		/**
+		 * The default value of the property.
+		 * @var mixed
+		 */
 		protected $defaultValue;
+		
+		/**
+		 * If this propertys value are multiple values.
+		 * @var bool
+		 */
 		protected $multipleChoice;
+		
+		/**
+		 * The value of the property.
+		 * @var bool
+		 */
 		protected $value;
+		
+		/**
+		 * If setting of the property is mandatory.
+		 * @var mixed
+		 */
+		protected $mandatory;
+		
+		/**
+		 * If the property should be displayes as a link in QBank.
+		 * @internal Probably not used in frontends.
+		 * @var mixed
+		 */
+		protected $link;
+		
+		/**
+		 * If the propertys value is a list of keywords.
+		 * @var mixed
+		 */
+		protected $keywords;
+		
+		/**
+		 * Information about the property.
+		 * @var string
+		 */
+		protected $info;
 		
 		/**
 		 * Creates a new property.
@@ -129,15 +200,64 @@
 		}
 		
 		/**
+		 * If the property is mandatory to set.
+		 * @author Björn Hjortsten
+		 * @return mixed True if the property is mandatory, false if not. Null if it does not apply.
+		 */
+		public function isMandatory() {
+			return $this->mandatory;
+		}
+		
+		/**
+		 * If the property is displayed as a link to other objects with the same value in QBank.
+		 * @internal Probably not used in frontends.
+		 * @author Björn Hjortsten
+		 * @return mixed True if the property is displayed as a link, false if not. Null if it does not apply.
+		 */
+		public function isLink() {
+			return $this->link;
+		}
+		
+		/**
+		 * If the property is a list of keywords.
+		 * @author Björn Hjortsten
+		 * @return mixed True if the property is a list of keywords, false if not. Null if it does not apply.
+		 */
+		public function isKeywords() {
+			return $this->keywords;
+		}
+		
+		/**
+		 * Gets the information given about the property.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
+		public function getInfo() {
+			return $this->info;
+		}
+		
+		/**
+		 * If the property is a system property.
+		 * @author Björn Hjortsten
+		 * @return bool
+		 */
+		public function isSystemProperty() {
+			if (stristr($this->systemName, 'system_') === false) {
+				return false;
+			}
+			return true;
+		}
+		
+		/**
 		 * Creates a {@link Property} from an object directly from a call to the API.
 		 * WARNING: If this is called with the wrong raw object, you may get warnings or even errors!
 		 * @param stdClass $rawProperty The raw object from the API-call.
 		 * @author Björn Hjortsten
-		 * @return {@link Property}
+		 * @return Property
 		 */
 		public static function createFromRawObject(stdClass $rawProperty) {
-			$propertValueType = Property::getPropertyValueTypeFromString($rawProperty->propertyType);
-			switch ($propertValueType) {
+			$propertyValueType = Property::getPropertyValueTypeFromString($rawProperty->propertyType);
+			switch ($propertyValueType) {
 				case PropertyValueType::QB_Array:
 					$value = explode('|', $rawProperty->value);
 					$defaultValue = explode('|', $rawProperty->defaultValue);
@@ -161,8 +281,15 @@
 					$defaultValue = intval($rawProperty->defaultValue);
 					break;
 				default:
-					$value = $rawProperty->value;
-					$defaultValue = $rawProperty->defaultValue;
+					if (isset($rawProperty->keywords) && (bool) $rawProperty->keywords === true) {
+						$value = explode('|', $rawProperty->value);
+						$defaultValue = explode('|', $rawProperty->defaultValue);
+						$value = array_filter($value);
+						$defaultValue = array_filter($defaultValue);
+					} else {
+						$value = $rawProperty->value;
+						$defaultValue = $rawProperty->defaultValue;
+					}
 					break;
 			}
 			if (empty($value)) {
@@ -171,8 +298,37 @@
 			if (empty($defaultValue)) {
 				$defaultValue = null;
 			}
-			return new Property(intval($rawProperty->propertyId), intval($rawProperty->id), $rawProperty->propertyName, $rawProperty->title, 
-									   $value, $defaultValue, $propertValueType, (bool) $rawProperty->multiplechoice, (bool) $rawProperty->editable);
+			$property = new Property(intval($rawProperty->propertyId), intval($rawProperty->id), $rawProperty->propertyName, $rawProperty->title, 
+									   $value, $defaultValue, $propertyValueType, (bool) $rawProperty->multiplechoice, (bool) $rawProperty->editable);
+			if (isset($rawProperty->editable)) {
+				$property->editable = (bool) $rawProperty->editable;
+			} else {
+				$property->editable = null;
+			}
+			if (isset($rawProperty->mandatory)) {
+				$property->mandatory = (bool) $rawProperty->mandatory;
+			} else {
+				$property->mandatory = null;
+			}
+			if (isset($rawProperty->keywords)) {
+				$property->keywords = (bool) $rawProperty->keywords;
+			} else {
+				$property->keywords = null;
+			}
+			if (isset($rawProperty->link)) {
+				$property->link = (bool) $rawProperty->link;
+			} else {
+				$property->link = null;
+			}
+			if (isset($rawProperty->info)) {
+				$property->info = $rawProperty->info;
+				if (empty($property->info)) {
+					$property->info = null;
+				}
+			} else {
+				$property->info = null;
+			}
+			return $property;
 		}
 		
 		/**
