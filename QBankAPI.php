@@ -7,7 +7,7 @@
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
 	 */
-	class QBankAPI {
+	abstract class QBankAPI {
 		
 		protected $qbankAddress;
 		protected $curlHandle;
@@ -21,13 +21,9 @@
 		 * @return QBankAPI
 		 */
 		public function __construct($qbankAddress) {
-			@session_start();
 			$this->qbankAddress = $qbankAddress;
 			$this->curlHandle = curl_init();
 			$this->requestTimeout = 10;
-			if (isset($_SESSION['api_hash']) && !empty($_SESSION['api_hash'])) {
-				$this->hash = $_SESSION['api_hash'];
-			}
 		}
 		
 		/**
@@ -38,6 +34,25 @@
 		 */
 		public function setTimeout($seconds) {
 			$this->requestTimeout = intval($seconds);
+		}
+		
+		/**
+		 * Sets the connection hash.
+		 * @param string $hash The connection hash.
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
+		public function setHash($hash) {
+			$this->hash = $hash;
+		}
+		
+		/**
+		 * Gets the connection hash.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
+		public function getHash() {
+			return $this->hash;
 		}
 		
 		/**
@@ -56,8 +71,7 @@
 			} catch (CommunicationException $ce) {
 				return false;
 			}
-			$this->hash = $result->hash;
-			$_SESSION['api_hash'] = $this->hash;
+			$this->setHash($result->hash);
 			return true;
 		}
 		
@@ -93,8 +107,12 @@
 				throw new ConnectionException($error, curl_errno($this->curlHandle));
 			} else {
 				$result = json_decode($result);
-				if ($result->success === false) {
-					throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
+				if (!isset($result->success) || $result->success === false) {
+					if (isset($result->error)) {
+						throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
+					} else {
+						throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error.');
+					}
 				}
 				return $result;
 			}

@@ -6,6 +6,7 @@
 	 * @internal This class does actually contain information about parents, but it does not present it publically.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @see Folder
 	 */
 	class SimpleFolder {
 		

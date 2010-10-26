@@ -7,6 +7,8 @@
 	 * Represents a QBank folder.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @see SimpleFolder
+	 * @see IHasProperties
 	 */
 	class Folder extends SimpleFolder implements IHasProperties {
 		
@@ -144,6 +146,7 @@
 		/**
 		 * Gets all the properties of this folder.
 		 * @author Björn Hjortsten
+		 * @see IHasProperties
 		 * @return array An array of {@link Property}(ies).
 		 */
 		public function getProperties() {
@@ -156,6 +159,7 @@
 		 * @param mixed $identifier Either the system name of the property or the propertys id.
 		 * @throws PropertyException Thrown if the folder does not have a property with the specified identifier.
 		 * @author Björn Hjortsten
+		 * @see IHasProperties
 		 * @return Property
 		 */
 		public function getProperty($identifier) {
