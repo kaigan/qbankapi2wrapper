@@ -24,7 +24,7 @@
 		}
 		
 		/**
-		 * Gets the hashed filename of an object.
+		 * Gets the hashed filename of an object minus the extension (normally .jpg for everything but original).
 		 * @param int $mediaId The media id of an object.
 		 * @param string $type The image type id. Standard types are 'original', 'medium' and 'thumb'.
 		 * @author Björn Hjortsten
@@ -32,6 +32,50 @@
 		 */
 		public static function getHashedFilename($mediaId, $type = 'original') {
 			return md5($mediaId.'_'.$type);
+		}
+		
+		/**
+		 * Gets the original media direct from QBank.
+		 * NOTE: This will prompt the user to download the original media.
+		 * WARNING: Will send a http-header.
+		 * @internal This will work even when an object is not deployed.
+		 * @param int $mediaId The mediaId of the object to fetch the original media.
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
+		public function getMedia($mediaId) {
+			header(sprintf('Location: %s/getMedia.php?hash=%s&id=%d', $this->apiAddress, $this->hash, $id));
+		}
+		
+		/**
+		 * Gets a property type from QBank.
+		 * @param string $systemName The name of the property type.
+		 * @author Björn Hjortsten
+		 * @return PropertyType
+		 */
+		public function getPropertyType($systemName) {
+			$result = $this->getPropertyTypes(array($systemName));
+			return $result[$systemName];
+		}
+		
+		/**
+		 * Gets several Property types.
+		 * @param mixed $param 
+		 */
+		public function getPropertyTypes($param) {
+			if (is_array($param)) {
+				$data['propertyTypeNames'] = $param;
+			} elseif (is_numeric($param)) {
+				//TODO fetch all from category
+				$data[''] = $param;
+			} else {
+				//TODO fetch all
+			}
+			$result = $this->call('getPropertyTypes', $data);
+			foreach ($result->propertyTypes as $propertyType) {
+				$propertyTypes[$propertyType->propertyName] = PropertyType::createFromRawObject($propertyType);
+			}
+			return $propertyTypes;
 		}
 	}
 ?>

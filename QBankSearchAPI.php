@@ -25,11 +25,12 @@
 		 * @param int $pageSize The number of results to return per page.
 		 * @param string $sort How to order the results, see {@link SearchOrder}.
 		 * @param bool $deployed If true, will only get deployed media.
+		 * @param bool $advanced If true, will get {@link Object}s instead of {@link SimpleObject}s.
 		 * @author Björn Hjortsten
 		 * @return SearchResult
 		 */
 		public function search($freetext = null, $folderId = null, $categoryId = null, array $objectIds = null, array $properties = null,
-							   $page = 1, $pageSize = 30, $sort = SearchOrder::ID_DESCENDING, $deployed = true) {
+							   $page = 1, $pageSize = 30, $sort = SearchOrder::ID_DESCENDING, $deployed = true, $advanced = false) {
 			$data = array();
 			$data['page'] = $page;
 			$data['pageSize'] = $pageSize;
@@ -58,12 +59,25 @@
 			}
 			
 			if ($deployed === true) {
-				$data['properties'][] = array('name' => 'system_media_status', 'value' => 'Published', 'operator' => 'EQ', 'forfetching' => false);
+				$data['properties'][] = array('name' => 'system_media_status', 'value' => 'Published', 'operator' => PropertyCriteria::EQUAL, 'forfetching' => false);
 			}
 			
 			$result = $this->call('search', $data);
-			foreach ($result->data->searchResults as $rawObject) {
-				$objects[] = SimpleObject::createFromRawObject($rawObject);
+			if (is_array($result->data->searchResults)) {
+				foreach ($result->data->searchResults as $rawObject) {
+					$objects[] = SimpleObject::createFromRawObject($rawObject);
+				}
+				if ($advanced === true) {
+					foreach ($objects as $key => $object) {
+						$calls[] = array('name' => $key, 'function' => 'getobjectinformation', 'arguments' => array('objectId' => $object->getId()));
+					}
+					$result2 = $this->call('batch', array('calls' => $calls));
+					foreach ($result2->results as $res) {
+						$objects[] = Object::createFromRawObject($res->data);
+					}
+				}
+			} else {
+				$objects = array();
 			}
 			$searchResult = new SearchResult($objects, intval($result->data->counter), $result->data->timeSearching, $result->data->step, $result->data->timeStamp, $result->data->end);
 			return $searchResult;

@@ -215,7 +215,7 @@
 		/**
 		 * Adds a folder to its place in a folder tree.
 		 * @internal Its crucial that all parent folders are already in the tree or this will fail.
-		 * @param array $tree The array of top level folders to add to. {@internal Passed by value.}
+		 * @param array $tree The array of top level folders to add to. {@internal Passed by value. }
 		 * @param Folder $folder The folder to add.
 		 * @param string $shortestTree The shortest tree that in the hierarchy.
 		 * @throws FolderException Thrown if the $tree is not prepared to recieve the $folder.

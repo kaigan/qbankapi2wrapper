@@ -8,7 +8,7 @@
 	interface PropertyValueType {
 		
 		/**
-		 * The value is an array.
+		 * The value is an array or a string, depends on if it is a multiple choice.
 		 * @var string
 		 */
 		const QB_Array = 'arr';

@@ -9,6 +9,7 @@
 	 */
 	abstract class QBankAPI {
 		
+		protected $apiAddress;
 		protected $qbankAddress;
 		protected $curlHandle;
 		protected $requestTimeout;
@@ -24,6 +25,7 @@
 			$this->qbankAddress = $qbankAddress;
 			$this->curlHandle = curl_init();
 			$this->requestTimeout = 10;
+			$this->apiAddress = 'http://api2.qbank.se';
 		}
 		
 		/**
@@ -85,12 +87,15 @@
 		 * @author Björn Hjortsten
 		 * @return mixed The result of a successfull callin in the form of an object or array where applicable.
 		 */
-		protected function call($function, $data) {
+		protected function call($function, $data, $log = false) {
 			if (!empty($this->hash) && strtolower($function) != 'login') {
 				$data['hash'] = $this->hash;
 			}
+			if ($log === true) {
+				error_log(sprintf('[%s] %s: %s'."\n",date('Y-m-d H:i:s'), $function, json_encode($data)), 3, '/var/www/libs/qbankapi/logs/json.log');
+			}
 			$data = 'data='.urlencode(json_encode($data));
-			$url = sprintf('http://api2.qbank.se/%s/%s', $this->qbankAddress, $function);
+			$url = sprintf('%s/%s/%s', $this->apiAddress, $this->qbankAddress, $function);
 			curl_setopt($this->curlHandle, CURLOPT_URL, $url);
 			curl_setopt($this->curlHandle, CURLOPT_POST, true);
 			curl_setopt($this->curlHandle, CURLOPT_POSTFIELDS, $data);
