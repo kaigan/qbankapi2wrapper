@@ -211,7 +211,7 @@
 				$result = $this->call('removeobjectfromfolder', $data);
 				return $result->success;
 			} catch (CommunicationException $ce) {
-				if ($ce->getCode() = 99) {
+				if ($ce->getCode() == 99) {
 					return false;
 				}
 				throw $ce;
