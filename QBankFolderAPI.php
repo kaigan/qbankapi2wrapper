@@ -171,5 +171,51 @@
 			$folder = $result->results->folder->folder;
 			return new SimpleFolder($folder->name, $folder->tree, $folder->owner, strtotime($folder->created), strtotime($folder->updated));
 		}
+		
+		/**
+		 * Adds an {@link Object} to a {@link Folder}.
+		 * @param int $folderId The id of the folder.
+		 * @param int $objectId The id of the object.
+		 * @throws CommunicationException Thrown if something went went wrong while adding the object to the folder.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @author Björn Hjortsten
+		 * @return bool True if the object was added, false if not.
+		 */
+		public function addObjectToFolder($folderId, $objectId) {
+			$data['folderId'] = $folderId;
+			$data['objectId'] = $objectId;
+			try {
+				$result = $this->call('addobjectTofolder', $data);
+				return $result->success;
+			} catch (CommunicationException $ce) {
+				if ($ce->getCode() == 99) {
+					return false;
+				}
+				throw $ce;
+			}
+		}
+		
+		/**
+		 * Removes an {@link Object} from a {@link Folder}.
+		 * @param int $folderId The id of the folder.
+		 * @param int $objectId The id of the object.
+		 * @throws CommunicationException Thrown if something went went wrong while removing the object to the folder.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @author Björn Hjortsten
+		 * @return bool True if the object was removed, false if not.
+		 */
+		public function removeObjectFromFolder($folderId, $objectId) {
+			$data['folderId'] = $folderId;
+			$data['objectId'] = $objectId;
+			try {
+				$result = $this->call('removeobjectfromfolder', $data);
+				return $result->success;
+			} catch (CommunicationException $ce) {
+				if ($ce->getCode() = 99) {
+					return false;
+				}
+				throw $ce;
+			}
+		}
 	}
 ?>

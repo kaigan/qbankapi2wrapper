@@ -116,7 +116,7 @@
 					if (isset($result->error)) {
 						throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
 					} else {
-						throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error.');
+						throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error.', 99, 'UnknownError');
 					}
 				}
 				return $result;

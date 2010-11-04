@@ -50,6 +50,8 @@
 		/**
 		 * Gets a property type from QBank.
 		 * @param string $systemName The name of the property type.
+		 * @throws CommunicationException Thrown if something went wrong while getting the property type.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
 		 * @return PropertyType
 		 */
@@ -60,9 +62,14 @@
 		
 		/**
 		 * Gets several Property types.
-		 * @param mixed $param 
+		 * @internal Not fully implemented yet. Only an array of system names are respected for now. Other values may cause undefined behaviour.
+		 * @param mixed $param Either an array of system names of property types or a category id or null.
+		 * @throws CommunicationException Thrown if something went wrong while getting the property types.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @author Björn Hjortsten
+		 * @return array An array of {@link PropertyType}s.
 		 */
-		public function getPropertyTypes($param) {
+		public function getPropertyTypes($param = null) {
 			if (is_array($param)) {
 				$data['propertyTypeNames'] = $param;
 			} elseif (is_numeric($param)) {
