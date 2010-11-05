@@ -2,6 +2,7 @@
 	require_once 'QBankAPI.php';
 	
 	require_once 'model/Object.php';
+	require_once 'model/ImageTemplate.php';
 	
 	/**
 	 * Provides functionality for objects in QBank.
@@ -44,7 +45,7 @@
 		 * @return void
 		 */
 		public function getMedia($mediaId) {
-			header(sprintf('Location: %s/getMedia.php?hash=%s&id=%d', $this->apiAddress, $this->hash, $id));
+			header(sprintf('Location: %s/%s/getMedia.php?hash=%s&id=%d', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId));
 		}
 		
 		/**
@@ -83,6 +84,31 @@
 				$propertyTypes[$propertyType->propertyName] = PropertyType::createFromRawObject($propertyType);
 			}
 			return $propertyTypes;
+		}
+		
+		/**
+		 * Gets all {@link ImageTemplate}s.
+		 * @throws CommunicationException Thrown if something went wrong while getting the image templates.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @author Björn Hjortsten
+		 * @return array An array of {@link ImageTemplate}s.
+		 */
+		public function getImageTemplates() {
+			$result = $this->call('getimagetemplates', array());
+			if (is_array($result->imagetemplates)) {
+				foreach ($result->imagetemplates as $template) {
+					$aspect = explode('x', $template->aspectratio);
+					$aspect = array_filter($aspect);
+					if (empty($aspect)) {
+						$aspect = null;
+					} else {
+						$aspect = implode(':', $aspect);
+					}
+					$templates[$template->templatename] = new ImageTemplate(strval($template->templatename), intval($template->width), intval($template->height), strval($template->filetype),
+																			$aspect, intval($template->quality), intval($template->resolution));
+				}
+			}
+			return $templates;
 		}
 	}
 ?>

@@ -26,11 +26,12 @@
 		 * @param string $sort How to order the results, see {@link SearchOrder}.
 		 * @param bool $deployed If true, will only get deployed media.
 		 * @param bool $advanced If true, will get {@link Object}s instead of {@link SimpleObject}s.
+		 * @param bool $exclusive If true, will treat $properties as requirements. If false, will treat properties as optional.
 		 * @author Björn Hjortsten
 		 * @return SearchResult
 		 */
 		public function search($freetext = null, $folderId = null, $categoryId = null, array $objectIds = null, array $properties = null,
-							   $page = 1, $pageSize = 30, $sort = SearchOrder::ID_DESCENDING, $deployed = true, $advanced = false) {
+							   $page = 1, $pageSize = 30, $sort = SearchOrder::ID_DESCENDING, $deployed = true, $advanced = false, $exclusive = true) {
 			$data = array();
 			$data['page'] = $page;
 			$data['pageSize'] = $pageSize;
@@ -61,9 +62,16 @@
 			if ($deployed === true) {
 				$data['properties'][] = array('name' => 'system_media_status', 'value' => 'Published', 'operator' => PropertyCriteria::EQUAL, 'forfetching' => false);
 			}
-			
-			$result = $this->call('search', $data);
-			if (is_array($result->data->searchResults)) {
+			//FIXME AND returnerar alltid 0 resultat
+			/*
+			if ($exclusive !== true) {
+				$data['operator'] = 'OR';
+			} else {
+				$data['operator'] = 'AND';
+			}
+			*/
+			$result = $this->call('search', $data, true);
+			if (is_array($result->data->searchResults) && !empty($result->data->searchResults)) {
 				foreach ($result->data->searchResults as $rawObject) {
 					$objects[] = SimpleObject::createFromRawObject($rawObject);
 				}

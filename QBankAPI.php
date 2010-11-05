@@ -85,7 +85,7 @@
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @throws CommunicationException Thrown if the call returned an exception.
 		 * @author Björn Hjortsten
-		 * @return mixed The result of a successfull callin in the form of an object or array where applicable.
+		 * @return mixed The result of a successfull call in the form of an object or array where applicable. If buffering is enabled, it will return the ticket name.
 		 */
 		protected function call($function, $data, $log = false) {
 			if (!empty($this->hash) && strtolower($function) != 'login') {
