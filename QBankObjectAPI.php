@@ -45,7 +45,7 @@
 		 * @return void
 		 */
 		public function getMedia($mediaId) {
-			header(sprintf('Location: %s/%s/getMedia.php?hash=%s&id=%d', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId));
+			header(sprintf('Location: %s/%s/getMedia?hash=%s&id=%d', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId));
 		}
 		
 		/**
@@ -109,6 +109,24 @@
 				}
 			}
 			return $templates;
+		}
+		
+		/**
+		 * Gets an {@link ImageTemplate}.
+		 * @param string $name The name of the image template to get.
+		 * @throws InvalidArgumentException Thrown if there is no image template with the specified name.
+		 * @throws CommunicationException Thrown if something went wrong while getting the image template.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @author Björn Hjortsten
+		 * @return ImageTemplate
+		 */
+		public function getImageTemplate($name) {
+			$templates = $this->getImageTemplates();
+			if (isset($templates[$name])) {
+				return $templates[$name];
+			} else {
+				throw new InvalidArgumentException(sprintf('No template with the name %s was found', $name));
+			}
 		}
 	}
 ?>
