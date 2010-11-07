@@ -4,6 +4,7 @@
 	require_once 'model/SearchOrder.php';
 	require_once 'model/SearchResult.php';
 	require_once 'model/PropertyCriteria.php';
+	require_once 'model/SimpleObject.php';
 	
 	/**
 	 * Provides functionality for searching in QBank.
