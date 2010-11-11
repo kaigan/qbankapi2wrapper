@@ -1,8 +1,8 @@
 <?php
-	require_once 'IHasProperties.php';
-	require_once 'Property.php';
+	require_once 'model/IHasProperties.php';
+	require_once 'model/Property.php';
 	
-	require_once dirname(__FILE__) . '/../exceptions/PropertyException.php';
+	require_once 'exceptions/PropertyException.php';
 	
 	/**
 	 * Represents a QBank object with the most basic information.

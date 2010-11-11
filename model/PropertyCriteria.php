@@ -31,7 +31,7 @@
 		 * @author Björn Hjortsten
 		 * @return PropertyCriteria
 		 */
-		public function __construct($systemName, $value, $operator, $forfetching = false) {
+		public function __construct($systemName, $value, $operator = PropertyCriteria::EQUAL, $forfetching = false) {
 			$this->systemName = $systemName;
 			$this->value = $value;
 			$this->operator = $operator;
