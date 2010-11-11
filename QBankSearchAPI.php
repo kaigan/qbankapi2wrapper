@@ -64,14 +64,11 @@
 			if ($deployed === true) {
 				$data['properties'][] = array('name' => 'system_media_status', 'value' => 'Published', 'operator' => PropertyCriteria::EQUAL, 'forfetching' => false);
 			}
-			//FIXME AND returnerar alltid 0 resultat
-			/*
 			if ($exclusive !== true) {
 				$data['operator'] = 'OR';
 			} else {
 				$data['operator'] = 'AND';
 			}
-			*/
 			$result = $this->call('search', $data, true);
 			if (is_array($result->data->searchResults) && !empty($result->data->searchResults)) {
 				foreach ($result->data->searchResults as $rawObject) {
