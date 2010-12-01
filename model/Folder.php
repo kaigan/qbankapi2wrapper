@@ -231,13 +231,18 @@
 				$tree[$folder->getId()] = $folder;
 			} else {
 				try {
-					$currentFolder = $tree[intval($folderTree[0], 16)];
+					$currentFolder = $tree[intval($folderTree[$rootLevel - 1], 16)];
+					if ($currentFolder == null) {
+						throw new FolderException(sprintf('Error while getting great parent folder. The great parent folder is supposed to be: %d, child folder: %d',
+														   intval($folderTree[$rootLevel - 1], 16), $folder->getId()));
+					}
 					for ($i = $rootLevel; $i < count($folderTree) - 1; $i++) {
 						$currentFolder = $currentFolder->getChild(intval($folderTree[$i], 16));
 					}
 					$currentFolder->addChild($folder);
 				} catch (FolderException $fe) {
-					throw new FolderException(sprintf('Error while adding folder to tree. Current folder id: %d, child folder id: %d', $currentFolder->getId(), $folder->getId()));
+					throw new FolderException(sprintf('Error while adding folder to tree. Current folder id: %d, child folder id: %d. Previous exception: %s',
+											  $currentFolder->getId(), $folder->getId(), $fe->getMessage()));
 				}
 			}
 		}

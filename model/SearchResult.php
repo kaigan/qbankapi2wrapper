@@ -1,6 +1,6 @@
 <?php
 	/**
-	 * Represents a subset of results from a search. Note that a search almost never the complete results due to paging.
+	 * Represents a subset of results from a search. Note that a search almost never return the complete results due to paging.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
 	 * @see QBankSearchAPI
