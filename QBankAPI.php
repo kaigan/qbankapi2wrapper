@@ -14,6 +14,7 @@
 		protected $curlHandle;
 		protected $requestTimeout;
 		protected $hash;
+		protected $useSSL;
 		
 		/**
 		 * Sets up the class and prepares for calls to the QBank API.
@@ -25,7 +26,7 @@
 			$this->qbankAddress = $qbankAddress;
 			$this->curlHandle = curl_init();
 			$this->requestTimeout = 10;
-			$this->apiAddress = 'http://api2.qbank.se';
+			$this->useSSL(false);						// Do not use SSL as default
 		}
 		
 		/**
@@ -78,6 +79,22 @@
 		}
 		
 		/**
+		 * Set whether the connection should use SSL or not.
+		 * The default is to not use SSL.
+		 * @param bool $bool
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
+		public function useSSL($bool) {
+			if ($bool === true) {
+				$this->apiAddress = 'https://api2.qbank.se';
+			} else {
+				$this->apiAddress = 'http://api2.qbank.se';
+			}
+			$this->useSSL = $bool;
+		}
+		
+		/**
 		 * Executes a call to the QBank API.
 		 * @internal Uses Curl to communicate.
 		 * @param string $function The name of the API-function to call.
@@ -103,6 +120,9 @@
 			curl_setopt($this->curlHandle, CURLOPT_FAILONERROR, true);
 			curl_setopt($this->curlHandle, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($this->curlHandle, CURLOPT_TIMEOUT, $this->requestTimeout);
+			if ($this->useSSL === true) {
+				curl_setopt($this->curlHandle, CURLOPT_SSL_VERIFYPEER, false);
+			}
 			curl_setopt($this->curlHandle, CURLOPT_USERAGENT, 'QBankAPIWrapper');
 			$result = curl_exec($this->curlHandle);
 			if ($result === false) {
