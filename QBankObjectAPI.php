@@ -32,6 +32,9 @@
 		 * @return string
 		 */
 		public static function getHashedFilename($mediaId, $type = 'original') {
+			if ($type == 'original') {
+				return md5($mediaId);
+			}
 			return md5($mediaId.'_'.$type);
 		}
 		
