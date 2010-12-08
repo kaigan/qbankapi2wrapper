@@ -63,12 +63,16 @@
 		 * @internal Do NOT save this info in the class anywhere!
 		 * @param string $username The users username.
 		 * @param string $password The users password.
+		 * @param int $languageId The language id to use.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
 		 * @return bool True if the login was successfull, empty if not.
 		 */
-		public function login($username, $password) {
+		public function login($username, $password, $languageId = null) {
 			$data = array('username' => $username, 'password' => $password);
+			if (!empty($languageId)) {
+				$data['languageId'] = intval($languageId);
+			}
 			try {
 				$result = $this->call('login', $data);
 			} catch (CommunicationException $ce) {

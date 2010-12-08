@@ -39,6 +39,57 @@
 		}
 		
 		/**
+		 * Forces download of a file. Displaces the file as an attachment to the page.
+		 * WARNING: Will close the current session if there is one.
+		 * @param string $pathToFile The path to the file to force download of.
+		 * @param string $filename The filename to present to the user.
+		 * @param string $mimetype The mime-type to present the file as.
+		 * @author Björn Hjortsten
+		 * @return bool True if the download went ok. False if not.
+		 */
+		public static function forceDownload($pathToFile, $filename, $mimetype = 'application/octet-stream') {
+			session_write_close();
+    		@ob_end_clean();
+    		$realPath = realpath($pathToFile);
+    		if ($realPath === false) {
+    			error_log(sprintf('Error while trying to force download of the path %s with the name %s. It is not a file!', $pathToFile, $filename));
+    			return false;
+    		} else {
+    			$pathToFile = $realPath;
+    		}
+    		if (!is_file($pathToFile)) {
+    			error_log(sprintf('Error while trying to force download of the path %s with the name %s. It is not a file!', $pathToFile, $filename));
+    			return false;
+    		}
+    		if (connection_status() != 0) {
+    			error_log(sprintf('Error while trying to force download of the path %s with the name %s. No connection to client!', $pathToFile, $filename));
+        		return false;
+    		}
+    		set_time_limit(0);
+    		
+    		if (strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
+        		$filename = preg_replace('/\./', '%2e', $name, substr_count($filename, '.') - 1);
+    		}
+    		
+    		header('Cache-Control: ');
+		    header('Pragma: ');
+		    header('Content-Type: '.$mimetype);
+		    header('Content-Length: ' .(string)(filesize($pathToFile)) );
+		    header('Content-Disposition: attachment; filename="'.$filename.'"');
+		    header('Content-Transfer-Encoding: binary'."\n");
+		    
+		    if ($fileHandle = fopen($pathToFile, 'rb')) {
+		        while ((!feof($fileHandle)) && (connection_status() == 0)) {
+		            print(fread($fileHandle, 1024*8));
+		            flush();
+		        }
+		        fclose($fileHandle);
+		    }
+		    
+		    return ((connection_status() == 0) and !connection_aborted());
+		}
+		
+		/**
 		 * Gets the original media direct from QBank.
 		 * NOTE: This will prompt the user to download the original media.
 		 * WARNING: Will send a http-header.

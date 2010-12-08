@@ -45,8 +45,10 @@
 						$folders[$folder->folderId] = new SimpleFolder($folder->name, $folder->tree, $folder->owner, strtotime($folder->created), strtotime($folder->updated));
 					}
 				}
+			} else {
+				return null;
 			}
-			if ($hierarchical === true) {
+			if ($hierarchical === true && is_array($folders)) {
 				$folders = Folder::createTree($folders);
 			}
 			return $folders;
