@@ -44,11 +44,12 @@
 		 * WARNING: Will send a http-header.
 		 * @internal This will work even when an object is not deployed.
 		 * @param int $mediaId The mediaId of the object to fetch the original media.
+		 * @param string $type The image type id. Standard types are 'original', 'medium' and 'thumb'.
 		 * @author Björn Hjortsten
 		 * @return void
 		 */
-		public function getMedia($mediaId) {
-			header(sprintf('Location: %s/%s/getMedia?hash=%s&id=%d', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId));
+		public function getMedia($mediaId, $type = 'original') {
+			header(sprintf('Location: %s/%s/getMedia?hash=%s&id=%d&type=%s', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId, $type));
 		}
 		
 		/**
