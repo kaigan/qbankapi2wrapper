@@ -14,6 +14,7 @@
 		protected $curlHandle;
 		protected $requestTimeout;
 		protected $hash;
+		protected $useSSL;
 		
 		/**
 		 * Sets up the class and prepares for calls to the QBank API.
@@ -25,7 +26,7 @@
 			$this->qbankAddress = $qbankAddress;
 			$this->curlHandle = curl_init();
 			$this->requestTimeout = 10;
-			$this->apiAddress = 'http://api2.qbank.se';
+			$this->useSSL(false);						// Do not use SSL as default
 		}
 		
 		/**
@@ -62,12 +63,16 @@
 		 * @internal Do NOT save this info in the class anywhere!
 		 * @param string $username The users username.
 		 * @param string $password The users password.
+		 * @param int $languageId The language id to use.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
 		 * @return bool True if the login was successfull, empty if not.
 		 */
-		public function login($username, $password) {
+		public function login($username, $password, $languageId = null) {
 			$data = array('username' => $username, 'password' => $password);
+			if (!empty($languageId)) {
+				$data['languageId'] = intval($languageId);
+			}
 			try {
 				$result = $this->call('login', $data);
 			} catch (CommunicationException $ce) {
@@ -75,6 +80,22 @@
 			}
 			$this->setHash($result->hash);
 			return true;
+		}
+		
+		/**
+		 * Set whether the connection should use SSL or not.
+		 * The default is to not use SSL.
+		 * @param bool $bool
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
+		public function useSSL($bool) {
+			if ($bool === true) {
+				$this->apiAddress = 'https://api2.qbank.se';
+			} else {
+				$this->apiAddress = 'http://api2.qbank.se';
+			}
+			$this->useSSL = $bool;
 		}
 		
 		/**
@@ -103,6 +124,9 @@
 			curl_setopt($this->curlHandle, CURLOPT_FAILONERROR, true);
 			curl_setopt($this->curlHandle, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($this->curlHandle, CURLOPT_TIMEOUT, $this->requestTimeout);
+			if ($this->useSSL === true) {
+				curl_setopt($this->curlHandle, CURLOPT_SSL_VERIFYPEER, false);
+			}
 			curl_setopt($this->curlHandle, CURLOPT_USERAGENT, 'QBankAPIWrapper');
 			$result = curl_exec($this->curlHandle);
 			if ($result === false) {

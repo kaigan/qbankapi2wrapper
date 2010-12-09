@@ -32,7 +32,7 @@
 		public function __construct($id, $propertyTypeId, $systemName, $title, $value, $defaultValue = null, 
 									$propertyValueType = PropertyValueType::QB_String, $multipleChoice = false, $editable = true) {
 			$this->id = $id;
-			parent::__construct($propertyTypeId, $systemName, $title, $value, $propertyValueType, $multipleChoice, $editable);
+			parent::__construct($propertyTypeId, $systemName, $title, $value, $defaultValue, $propertyValueType, $multipleChoice, $editable);
 		}
 		
 		/**
@@ -52,7 +52,12 @@
 		 * @return Property
 		 */
 		public static function createFromRawObject(stdClass $rawProperty) {
-			$propertyValueType = Property::getPropertyValueTypeFromString($rawProperty->propertyType);
+			if (!is_null($rawProperty->propertyType)) {
+				$propertyValueType = Property::getPropertyValueTypeFromString($rawProperty->propertyType);
+			} else {
+				$propertyValueType = null;
+			}
+			
 			switch ($propertyValueType) {
 				case PropertyValueType::QB_Array:
 					if ($rawProperty->multiplechoice == true) {
@@ -80,7 +85,7 @@
 					$value = intval($rawProperty->value);
 					$defaultValue = intval($rawProperty->defaultValue);
 					break;
-				default:
+				case PropertyValueType::QB_String:
 					if (isset($rawProperty->keywords) && (bool) $rawProperty->keywords === true) {
 						$value = explode('|', $rawProperty->value);
 						$defaultValue = explode('|', $rawProperty->defaultValue);
@@ -90,6 +95,9 @@
 						$value = $rawProperty->value;
 						$defaultValue = $rawProperty->defaultValue;
 					}
+					break;
+				default:
+					return Property::createFromSecondaryRawObject($rawProperty);
 					break;
 			}
 			if (empty($value)) {
@@ -128,6 +136,55 @@
 			} else {
 				$property->info = null;
 			}
+			return $property;
+		}
+		
+		/**
+		 * Creates a {@link Property} from an object directly from a call to the API.
+		 * Guesses the property since much less information is available.
+		 * WARNING: If this is called with the wrong raw object, you may get warnings or even errors!
+		 * @param stdClass $rawProperty The raw object from the API-call.
+		 * @author Björn Hjortsten
+		 * @return Property
+		 */
+		protected static function createFromSecondaryRawObject(stdClass $rawProperty) {
+			if (!empty($rawProperty->arrValue)) {
+				$value = explode('|', $rawProperty->value);
+				$value = array_filter($value);
+				$propertyValueType = PropertyValueType::QB_Array;
+			} elseif (!is_null($rawProperty->boolValue)) {
+				$value = (bool) $rawProperty->boolValue;
+				$propertyValueType = PropertyValueType::QB_Bool;
+			} elseif (!empty($rawProperty->dateValue)) {
+				$value = strtotime($rawProperty->dateValue);
+				$propertyValueType = PropertyValueType::QB_Date;
+			} elseif (!is_null($rawProperty->floatValue)) {
+				$value = floatval($rawProperty->floatValue);
+				$propertyValueType = PropertyValueType::QB_Float;
+			} elseif (!empty($rawProperty->labelValue)) {
+				$value = strval($rawProperty->labelValue);
+				$propertyValueType = PropertyValueType::QB_String;
+			} elseif (!is_null($rawProperty->intValue)) {
+				$value = intval($rawProperty->intValue);
+				$propertyValueType = PropertyValueType::QB_Int;
+			} elseif (!empty($rawProperty->textValue)) {
+				$value = strval($rawProperty->textValue);
+				$propertyValueType = PropertyValueType::QB_String;
+			} elseif (!empty($rawProperty->xmlValue)) {
+				$value = strval($rawProperty->xmlValue);
+				$propertyValueType = PropertyValueType::QB_String;
+			} else {
+				$value = $rawProperty->strValue;
+				$propertyValueType = PropertyValueType::QB_String;
+			}
+			$property = new Property(intval($rawProperty->id), intval($rawProperty->propertyTypeId), $rawProperty->propertyName, $rawProperty->title,
+									 $value, null, $propertyValueType, false, false);
+			$property->editable = null;
+			$property->mandatory = null;
+			$property->keywords = null;
+			$property->link = null;
+			$property->info = null;
+			
 			return $property;
 		}
 	}

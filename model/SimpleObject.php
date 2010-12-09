@@ -397,7 +397,7 @@
 			$object->thumbnailWidth = intval($width);
 			$object->thumbnailHeigth = intval($height);
 			
-			if (isset($rawObject->properties) && is_array($rawObject->properties)) {
+			if (isset($rawObject->properties) && (is_array($rawObject->properties) || is_object($rawObject->properties))) {
 				foreach ($rawObject->properties as $rawProperty) {
 					$properties[] = Property::createFromRawObject($rawProperty);
 				}

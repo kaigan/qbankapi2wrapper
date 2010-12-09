@@ -15,7 +15,7 @@
 		/**
 		 * Gets folders from QBank.
 		 * Default is to get all folders.
-		 * @param int $rootFolder The folder to consider as root.
+		 * @param int $rootFolderId The folder to consider as root.
 		 * @param int $depth How many levels of folders to get.
 		 * @param bool $hierarchical If set to true, will return a hierachial list of {@link Folder}s.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
@@ -45,8 +45,10 @@
 						$folders[$folder->folderId] = new SimpleFolder($folder->name, $folder->tree, $folder->owner, strtotime($folder->created), strtotime($folder->updated));
 					}
 				}
+			} else {
+				return null;
 			}
-			if ($hierarchical === true) {
+			if ($hierarchical === true && is_array($folders)) {
 				$folders = Folder::createTree($folders);
 			}
 			return $folders;

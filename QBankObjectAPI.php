@@ -32,7 +32,61 @@
 		 * @return string
 		 */
 		public static function getHashedFilename($mediaId, $type = 'original') {
+			if ($type == 'original') {
+				return md5($mediaId);
+			}
 			return md5($mediaId.'_'.$type);
+		}
+		
+		/**
+		 * Forces download of a file. Displaces the file as an attachment to the page.
+		 * WARNING: Will close the current session if there is one.
+		 * @param string $pathToFile The path to the file to force download of.
+		 * @param string $filename The filename to present to the user.
+		 * @param string $mimetype The mime-type to present the file as.
+		 * @author Björn Hjortsten
+		 * @return bool True if the download went ok. False if not.
+		 */
+		public static function forceDownload($pathToFile, $filename, $mimetype = 'application/octet-stream') {
+			session_write_close();
+    		@ob_end_clean();
+    		$realPath = realpath($pathToFile);
+    		if ($realPath === false) {
+    			error_log(sprintf('Error while trying to force download of the path %s with the name %s. It is not a file!', $pathToFile, $filename));
+    			return false;
+    		} else {
+    			$pathToFile = $realPath;
+    		}
+    		if (!is_file($pathToFile)) {
+    			error_log(sprintf('Error while trying to force download of the path %s with the name %s. It is not a file!', $pathToFile, $filename));
+    			return false;
+    		}
+    		if (connection_status() != 0) {
+    			error_log(sprintf('Error while trying to force download of the path %s with the name %s. No connection to client!', $pathToFile, $filename));
+        		return false;
+    		}
+    		set_time_limit(0);
+    		
+    		if (strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
+        		$filename = preg_replace('/\./', '%2e', $name, substr_count($filename, '.') - 1);
+    		}
+    		
+    		header('Cache-Control: ');
+		    header('Pragma: ');
+		    header('Content-Type: '.$mimetype);
+		    header('Content-Length: ' .(string)(filesize($pathToFile)) );
+		    header('Content-Disposition: attachment; filename="'.$filename.'"');
+		    header('Content-Transfer-Encoding: binary'."\n");
+		    
+		    if ($fileHandle = fopen($pathToFile, 'rb')) {
+		        while ((!feof($fileHandle)) && (connection_status() == 0)) {
+		            print(fread($fileHandle, 1024*8));
+		            flush();
+		        }
+		        fclose($fileHandle);
+		    }
+		    
+		    return ((connection_status() == 0) and !connection_aborted());
 		}
 		
 		/**
@@ -41,11 +95,12 @@
 		 * WARNING: Will send a http-header.
 		 * @internal This will work even when an object is not deployed.
 		 * @param int $mediaId The mediaId of the object to fetch the original media.
+		 * @param string $type The image type id. Standard types are 'original', 'medium' and 'thumb'.
 		 * @author Björn Hjortsten
 		 * @return void
 		 */
-		public function getMedia($mediaId) {
-			header(sprintf('Location: %s/%s/getMedia?hash=%s&id=%d', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId));
+		public function getMedia($mediaId, $type = 'original') {
+			header(sprintf('Location: %s/%s/getMedia?hash=%s&id=%d&type=%s', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId, $type));
 		}
 		
 		/**
