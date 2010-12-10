@@ -4,6 +4,7 @@
 	 * @internal Base class for all errors in the QBank API.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @package QBankAPIWrapper
 	 */
 	class QBankAPIException extends Exception {
 	}

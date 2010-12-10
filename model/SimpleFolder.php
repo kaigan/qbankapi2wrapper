@@ -7,6 +7,7 @@
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
 	 * @see Folder
+	 * @package QBankAPIWrapper
 	 */
 	class SimpleFolder {
 		

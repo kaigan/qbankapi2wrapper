@@ -9,6 +9,7 @@
 	 * Provides functionality for folders in QBank.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @package QBankAPIWrapper
 	 */
 	class QBankFolderAPI extends QBankAPI {
 		

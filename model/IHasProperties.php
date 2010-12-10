@@ -12,6 +12,7 @@
 		 * Gets all the properties.
 		 * @author Björn Hjortsten
 		 * @return array An array of {@link Property}(ies).
+		 * @package QBankAPIWrapper
 		 */
 		public function getProperties();
 		

@@ -4,6 +4,7 @@
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
 	 * @see QBankSearchAPI
+	 * @package QBankAPIWrapper
 	 */
 	class SearchResult implements ArrayAccess, Iterator, Countable {
 		

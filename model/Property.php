@@ -6,6 +6,7 @@
 	 * Represents a QBank property.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @package QBankAPIWrapper
 	 */
 	class Property extends PropertyType {
 		

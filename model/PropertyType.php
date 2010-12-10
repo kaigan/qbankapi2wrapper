@@ -5,6 +5,7 @@
 	 * Represents a QBank property type.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @package QBankAPIWrapper
 	 */
 	class PropertyType {
 		

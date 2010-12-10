@@ -10,6 +10,7 @@
 	 * @copyright Kaigan TBK 2010
 	 * @see Object
 	 * @see IHasProperties
+	 * @package QBankAPIWrapper
 	 */
 	class SimpleObject implements IHasProperties {
 		

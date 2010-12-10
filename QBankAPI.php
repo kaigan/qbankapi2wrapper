@@ -6,8 +6,11 @@
 	 * Base class for the QBank API. Provides basic functionality.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @package QBankAPIWrapper
 	 */
 	abstract class QBankAPI {
+		
+		const VERSION = '1.0';
 		
 		protected $apiAddress;
 		protected $qbankAddress;
@@ -127,7 +130,7 @@
 			if ($this->useSSL === true) {
 				curl_setopt($this->curlHandle, CURLOPT_SSL_VERIFYPEER, false);
 			}
-			curl_setopt($this->curlHandle, CURLOPT_USERAGENT, 'QBankAPIWrapper');
+			curl_setopt($this->curlHandle, CURLOPT_USERAGENT, 'QBankAPIWrapper '.QBankAPI::VERSION);
 			$result = curl_exec($this->curlHandle);
 			if ($result === false) {
 				$error = sprintf('Error while comunicating with QBank: %s', curl_error($this->curlHandle));

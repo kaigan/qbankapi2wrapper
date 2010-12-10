@@ -13,6 +13,7 @@
 	 * @copyright Kaigan TBK 2010
 	 * @see SearchResult
 	 * @see PropertyCriteria
+	 * @package QBankAPIWrapper
 	 */
 	class QBankSearchAPI extends QBankAPI {
 		
@@ -29,11 +30,13 @@
 		 * @param bool $deployed If true, will only get deployed media.
 		 * @param bool $advanced If true, will get {@link Object}s instead of {@link SimpleObject}s.
 		 * @param bool $exclusive If true, will treat $properties as requirements. If false, will treat properties as optional.
+		 * @param bool $recurse If true, will search the supplied folders subfolders as well. If false, will only search in the supplied folder.
 		 * @author Björn Hjortsten
 		 * @return SearchResult
 		 */
 		public function search($freetext = null, $folderId = null, $categoryId = null, array $objectIds = null, array $properties = null,
-							   $page = 1, $pageSize = 30, $sort = SearchOrder::ID_DESCENDING, $deployed = true, $advanced = false, $exclusive = true) {
+							   $page = 1, $pageSize = 30, $sort = SearchOrder::ID_DESCENDING, $deployed = true, $advanced = false, $exclusive = true,
+							   $folderRecurse = false) {
 			$data = array();
 			$data['page'] = $page;
 			$data['pageSize'] = $pageSize;
@@ -45,6 +48,7 @@
 			}
 			if (isset($folderId)) {
 				$data['folderId'] = $folderId;
+				$data['recursive'] = $folderRecurse;
 			}
 			if (isset($categoryId)) {
 				$data['categoryId'] = $categoryId;

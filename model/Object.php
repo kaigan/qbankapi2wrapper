@@ -6,6 +6,7 @@
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
 	 * @see SimpleObject
+	 * @package QBankAPIWrapper
 	 */
 	class Object extends SimpleObject {
 		
