@@ -10,7 +10,7 @@
 	 */
 	abstract class QBankAPI {
 		
-		const VERSION = '1.0';
+		const VERSION = '1.0.28';
 		
 		protected $apiAddress;
 		protected $qbankAddress;
