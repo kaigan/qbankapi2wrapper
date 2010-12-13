@@ -1,4 +1,5 @@
 <?php
+	require_once 'exceptions/QBankAPIException.php';
 	require_once 'exceptions/ConnectionException.php';
 	require_once 'exceptions/CommunicationException.php';
 	
@@ -10,7 +11,14 @@
 	 */
 	abstract class QBankAPI {
 		
-		const VERSION = '1.0.28';
+		/**
+		 * The version of QBankAPIWrapper.
+		 * @var string
+		 */
+		const VERSION = '1.0.29';
+		
+		const CALLS_LOG = '/var/log/qbankapiwrapper/calls.log';
+		const UNKNOWNS_LOG = '/var/log/qbankapiwrapper/unknowns.log';
 		
 		protected $apiAddress;
 		protected $qbankAddress;
@@ -22,6 +30,7 @@
 		/**
 		 * Sets up the class and prepares for calls to the QBank API.
 		 * @param string $qbankAddress The address to the qbank being called.
+		 * @throws QBankAPIException Thrown if unable to access or create logfiles.
 		 * @author Björn Hjortsten
 		 * @return QBankAPI
 		 */
@@ -30,6 +39,35 @@
 			$this->curlHandle = curl_init();
 			$this->requestTimeout = 10;
 			$this->useSSL(false);						// Do not use SSL as default
+			
+			// Check for logfiles
+			// Does the log directory exist?
+			if (!is_dir('/var/log/qbankapiwrapper/')) {
+				if (@mkdir('/var/log/qbankapiwrapper/', 0774) === false) {
+					throw new QBankAPIException('Could not create the log file folder!');
+				}
+			}
+			
+			// Does the calls log file exist?
+			if (!is_writable(QBankAPI::CALLS_LOG)) {
+				$calls = @fopen(QBankAPI::CALLS_LOG, 'ab');
+				if ($calls === false) {
+					@fclose($calls);
+					echo 'path'.QBankAPI::CALLS_LOG;
+					throw new QBankAPIException('Could not create the log file!');
+				}
+				@fclose($calls);
+			}
+			
+			// Does the unknowns log file exist?
+			if (!is_writable(QBankAPI::UNKNOWNS_LOG)) {
+				$calls = @fopen(QBankAPI::UNKNOWNS_LOG, 'ab');
+				if ($calls === false) {
+					@fclose($calls);
+					throw new QBankAPIException('Could not create the log file!');
+				}
+				@fclose($calls);
+			}
 		}
 		
 		/**
@@ -115,10 +153,8 @@
 			if (!empty($this->hash) && strtolower($function) != 'login') {
 				$data['hash'] = $this->hash;
 			}
-			if ($log === true) {
-				error_log(sprintf('[%s] %s: %s'."\n",date('Y-m-d H:i:s'), $function, json_encode($data)), 3, '/var/www/libs/qbankapi/logs/json.log');
-			}
-			$data = 'data='.urlencode(json_encode($data));
+			$json = json_encode($data);
+			$data = 'data='.urlencode($json);
 			$url = sprintf('%s/%s/%s', $this->apiAddress, $this->qbankAddress, $function);
 			curl_setopt($this->curlHandle, CURLOPT_URL, $url);
 			curl_setopt($this->curlHandle, CURLOPT_POST, true);
@@ -131,20 +167,25 @@
 				curl_setopt($this->curlHandle, CURLOPT_SSL_VERIFYPEER, false);
 			}
 			curl_setopt($this->curlHandle, CURLOPT_USERAGENT, 'QBankAPIWrapper '.QBankAPI::VERSION);
-			$result = curl_exec($this->curlHandle);
-			if ($result === false) {
+			$resultJSON = curl_exec($this->curlHandle);
+			if ($resultJSON === false) {
 				$error = sprintf('Error while comunicating with QBank: %s', curl_error($this->curlHandle));
 				curl_close($this->curlHandle);
 				$this->curlHandle = curl_init();
 				throw new ConnectionException($error, curl_errno($this->curlHandle));
 			} else {
-				$result = json_decode($result);
+				$result = json_decode($resultJSON);
 				if (!isset($result->success) || $result->success === false) {
 					if (isset($result->error)) {
+						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
 						throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
 					} else {
-						throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error.', 99, 'UnknownError');
+						error_log(sprintf('[%s] (%s) %s: %s'."\n\t".'Response: %s'."\n", date('Y-m-d H:i:s'), 'UNKNOWN ERROR', $this->qbankAddress.'/'.$function, $json, $resultJSON), 3, QBankAPI::UNKNOWNS_LOG);
+						throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error. Please note the time and report this to support@kaigantbk.se', 99, 'UnknownError');
 					}
+				}
+				if ($log === true) {
+					error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
 				}
 				return $result;
 			}
