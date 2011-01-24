@@ -101,12 +101,6 @@
 					return Property::createFromSecondaryRawObject($rawProperty);
 					break;
 			}
-			if (empty($value)) {
-				$value = null;
-			}
-			if (empty($defaultValue)) {
-				$defaultValue = null;
-			}
 			$property = new Property(intval($rawProperty->propertyId), intval($rawProperty->id), $rawProperty->propertyName, $rawProperty->title, 
 									   $value, $defaultValue, $propertyValueType, (bool) $rawProperty->multiplechoice, (bool) $rawProperty->editable);
 			if (isset($rawProperty->editable)) {
