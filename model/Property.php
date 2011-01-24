@@ -144,8 +144,9 @@
 		 */
 		protected static function createFromSecondaryRawObject(stdClass $rawProperty) {
 			if (!empty($rawProperty->arrValue)) {
-				$value = explode('|', $rawProperty->value);
+				$value = explode('|', $rawProperty->arrValue);
 				$value = array_filter($value);
+				array_walk($value, array('Property', 'utrim'));
 				$propertyValueType = PropertyValueType::QB_Array;
 			} elseif (!is_null($rawProperty->boolValue)) {
 				$value = (bool) $rawProperty->boolValue;
@@ -181,6 +182,10 @@
 			$property->info = null;
 			
 			return $property;
+		}
+		
+		private static function utrim(&$value) {
+			$value = trim($value);
 		}
 	}
 ?>
