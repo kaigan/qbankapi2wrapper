@@ -4,6 +4,7 @@
 	 * @internal Actually represents an enum, not to be used as an interface.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @package QBankAPIWrapper
 	 */
 	interface PropertyValueType {
 		

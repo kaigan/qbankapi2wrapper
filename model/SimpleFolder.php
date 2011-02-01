@@ -7,6 +7,7 @@
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
 	 * @see Folder
+	 * @package QBankAPIWrapper
 	 */
 	class SimpleFolder {
 		
@@ -86,9 +87,9 @@
 		/**
 		 * Gets the folders tree.
 		 * @author Björn Hjortsten
-		 * @return string The folders tree.
+		 * @return string The folders tree in the form of hyphen separated ids.
 		 */
-		protected function getTree() {
+		public function getTree() {
 			return $this->tree;
 		}
 		
@@ -124,7 +125,7 @@
 		 * @author Björn Hjortsten
 		 * @return int The folders parent id.
 		 */
-		protected function getParentId() {
+		public function getParentId() {
 			return $this->parentFolderId;
 		}
 		

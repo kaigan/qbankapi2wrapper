@@ -4,6 +4,7 @@
 	 * Represents an error in communication with QBank.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @package QBankAPIWrapper
 	 */
 	class CommunicationException extends QBankAPIException {
 		protected $type;

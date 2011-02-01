@@ -4,6 +4,7 @@
 	 * An image template describes how an original image transforms when published.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @package QBankAPIWrapper
 	 */
 	class ImageTemplate {
 		

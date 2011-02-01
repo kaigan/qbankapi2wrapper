@@ -9,6 +9,7 @@
 	 * @copyright Kaigan TBK 2010
 	 * @see SimpleFolder
 	 * @see IHasProperties
+	 * @package QBankAPIWrapper
 	 */
 	class Folder extends SimpleFolder implements IHasProperties {
 		

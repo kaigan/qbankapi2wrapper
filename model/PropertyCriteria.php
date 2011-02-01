@@ -5,6 +5,7 @@
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
 	 * @see QBankSearchAPI
+	 * @package QBankAPIWrapper
 	 */
 	class PropertyCriteria {
 		const EQUAL = 'EQ';

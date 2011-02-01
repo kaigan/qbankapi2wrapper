@@ -8,6 +8,7 @@
 	 * Provides functionality for objects in QBank.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @package QBankAPIWrapper
 	 */
 	class QBankObjectAPI extends QBankAPI {
 		

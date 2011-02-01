@@ -6,6 +6,7 @@
 	 * Represents a QBank property.
 	 * @author Björn Hjortsten
 	 * @copyright Kaigan TBK 2010
+	 * @package QBankAPIWrapper
 	 */
 	class Property extends PropertyType {
 		
@@ -100,12 +101,6 @@
 					return Property::createFromSecondaryRawObject($rawProperty);
 					break;
 			}
-			if (empty($value)) {
-				$value = null;
-			}
-			if (empty($defaultValue)) {
-				$defaultValue = null;
-			}
 			$property = new Property(intval($rawProperty->propertyId), intval($rawProperty->id), $rawProperty->propertyName, $rawProperty->title, 
 									   $value, $defaultValue, $propertyValueType, (bool) $rawProperty->multiplechoice, (bool) $rawProperty->editable);
 			if (isset($rawProperty->editable)) {
@@ -149,8 +144,9 @@
 		 */
 		protected static function createFromSecondaryRawObject(stdClass $rawProperty) {
 			if (!empty($rawProperty->arrValue)) {
-				$value = explode('|', $rawProperty->value);
+				$value = explode('|', $rawProperty->arrValue);
 				$value = array_filter($value);
+				array_walk($value, array('Property', 'utrim'));
 				$propertyValueType = PropertyValueType::QB_Array;
 			} elseif (!is_null($rawProperty->boolValue)) {
 				$value = (bool) $rawProperty->boolValue;
@@ -186,6 +182,10 @@
 			$property->info = null;
 			
 			return $property;
+		}
+		
+		private static function utrim(&$value) {
+			$value = trim($value);
 		}
 	}
 ?>
