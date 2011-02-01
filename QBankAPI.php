@@ -15,7 +15,7 @@
 		 * The version of QBankAPIWrapper.
 		 * @var string
 		 */
-		const VERSION = '1.0.29';
+		const VERSION = '1.0.33';
 		
 		const CALLS_LOG = '/var/log/qbankapiwrapper/calls.log';
 		const UNKNOWNS_LOG = '/var/log/qbankapiwrapper/unknowns.log';
@@ -41,10 +41,15 @@
 			$this->useSSL(false);						// Do not use SSL as default
 			
 			// Check for logfiles
-			// Does the log directory exist?
-			if (!is_dir('/var/log/qbankapiwrapper/')) {
-				if (@mkdir('/var/log/qbankapiwrapper/', 0774) === false) {
-					throw new QBankAPIException('Could not create the log file folder!');
+			// Does the log directories exist?
+			if (!is_dir(dirname(QBankAPI::CALLS_LOG))) {
+				if (@mkdir(dirname(QBankAPI::CALLS_LOG), 0774) === false) {
+					throw new QBankAPIException('Could not create the calls log file folder!');
+				}
+			}
+			if (!is_dir(dirname(QBankAPI::UNKNOWNS_LOG))) {
+				if (@mkdir(dirname(QBankAPI::UNKNOWNS_LOG), 0774) === false) {
+					throw new QBankAPIException('Could not create the unknown calls log file folder!');
 				}
 			}
 			
@@ -107,7 +112,7 @@
 		 * @param int $languageId The language id to use.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
-		 * @return bool True if the login was successfull, empty if not.
+		 * @return bool True if the login was successfull, false if not.
 		 */
 		public function login($username, $password, $languageId = null) {
 			$data = array('username' => $username, 'password' => $password);

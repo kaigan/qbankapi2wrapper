@@ -30,7 +30,7 @@
 		 * @param bool $deployed If true, will only get deployed media.
 		 * @param bool $advanced If true, will get {@link Object}s instead of {@link SimpleObject}s.
 		 * @param bool $exclusive If true, will treat $properties as requirements. If false, will treat properties as optional.
-		 * @param bool $recurse If true, will search the supplied folders subfolders as well. If false, will only search in the supplied folder.
+		 * @param bool $folderRecurse If true, will search the supplied folders subfolders as well. If false, will only search in the supplied folder.
 		 * @author Björn Hjortsten
 		 * @return SearchResult
 		 */
@@ -54,6 +54,7 @@
 				$data['categoryId'] = $categoryId;
 			}
 			if (isset($objectIds) && is_array($objectIds)) {
+				$objectIds = array_unique($objectIds, SORT_NUMERIC);
 				$data['objectIds'] = implode(',', $objectIds);
 			}
 			if (isset($properties) && is_array($properties)) {
@@ -83,6 +84,7 @@
 						$calls[] = array('name' => $key, 'function' => 'getobjectinformation', 'arguments' => array('objectId' => $object->getId()));
 					}
 					$result2 = $this->call('batch', array('calls' => $calls));
+					$objects = array();
 					foreach ($result2->results as $res) {
 						$objects[] = Object::createFromRawObject($res->data);
 					}
