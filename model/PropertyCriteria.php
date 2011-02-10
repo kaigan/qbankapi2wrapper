@@ -36,7 +36,7 @@
 			$this->systemName = $systemName;
 			$this->value = $value;
 			$this->operator = $operator;
-			$this->forfetching = $forfetching;
+			$this->forfetching = (bool)$forfetching;
 		}
 		
 		/**

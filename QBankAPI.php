@@ -15,7 +15,7 @@
 		 * The version of QBankAPIWrapper.
 		 * @var string
 		 */
-		const VERSION = '1.0.33';
+		const VERSION = '1.0.34';
 		
 		const CALLS_LOG = '/var/log/qbankapiwrapper/calls.log';
 		const UNKNOWNS_LOG = '/var/log/qbankapiwrapper/unknowns.log';
