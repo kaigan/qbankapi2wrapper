@@ -15,7 +15,7 @@
 		 * The version of QBankAPIWrapper.
 		 * @var string
 		 */
-		const VERSION = '1.0.34';
+		const VERSION = '1.0.36';
 		
 		const CALLS_LOG = '/var/log/qbankapiwrapper/calls.log';
 		const UNKNOWNS_LOG = '/var/log/qbankapiwrapper/unknowns.log';
@@ -204,5 +204,16 @@
 		public function __destruct() {
 			curl_close($this->curlHandle);
 		}
+	}
+	
+	/**
+	 * Silly wrapper function since empty() does not work properly with return values.
+	 * @param mixed $var
+	 * @see empty()
+	 * @author Björn Hjortsten
+	 * @return bool
+	 */
+	function is_empty($var) {
+		return empty($var);
 	}
 ?>

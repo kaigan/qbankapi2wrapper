@@ -3,6 +3,7 @@
 	
 	require_once 'model/Object.php';
 	require_once 'model/ImageTemplate.php';
+	require_once 'model/DeploymentSite.php';
 	
 	/**
 	 * Provides functionality for objects in QBank.
@@ -183,6 +184,23 @@
 			} else {
 				throw new InvalidArgumentException(sprintf('No template with the name %s was found', $name));
 			}
+		}
+		
+		/**
+		 * Gets deployment information about an object.
+		 * @param int $objectId The id of the object to get deployment information about.
+		 * @author Björn Hjortsten
+		 * @return array An array of {@link DeploymentSite}s.
+		 */
+		public function getDeploymentInformation($objectId) {
+			$results = $this->call('getdeploymentinformation', array('objectId' => $objectId));
+			$siteInfo = array();
+			if (is_array($results->sites) && !empty($results->sites)) {
+				foreach ($results->sites as $result) {
+					$siteInfo[] = DeploymentSite::createFromRawObject($result);
+				}
+			}
+			return $siteInfo;
 		}
 	}
 ?>

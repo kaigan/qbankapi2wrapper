@@ -53,7 +53,7 @@
 		 * @return Property
 		 */
 		public static function createFromRawObject(stdClass $rawProperty) {
-			if (!is_null($rawProperty->propertyType)) {
+			if (@!is_null($rawProperty->propertyType)) {
 				$propertyValueType = Property::getPropertyValueTypeFromString($rawProperty->propertyType);
 			} else {
 				$propertyValueType = null;

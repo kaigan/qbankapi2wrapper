@@ -61,7 +61,7 @@
 		 * @author Björn Hjortsten
 		 * @return int
 		 */
-		public function getMaxHeigth() {
+		public function getMaxHeight() {
 			return $this->maxHeight;
 		}
 		
