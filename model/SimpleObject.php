@@ -310,14 +310,27 @@
 			return $this->thumbnailHeigth;
 		}
 		
-	/**
+		/**
 		 * Gets all properties of the object.
+		 * @param array $identifiers An array of identifiers {@see SimpleObject::getProperty()}.
 		 * @author Björn Hjortsten
 		 * @see IHasProperties::getProperties()
 		 * @return array An array of {@link Property}(ies).
 		 */
-		public function getProperties() {
-			return $this->properties;
+		public function getProperties(array $identifiers = array()) {
+			if (empty($identifiers)) {
+				return $this->properties;
+			}
+			$properties = array();
+			foreach ($identifiers as $identfier) {
+				try {
+					$property = $this->getProperty($identifier);
+					$properties[$property->getSystemName()] = $property;
+				} catch (PropertyException $pe) {
+					trigger_error($pe->getMessage().' Skipping.', 'warning');
+				}
+			}
+			return $properties;
 		}
 		
 		/**
@@ -399,6 +412,7 @@
 			$object->thumbnailHeigth = intval($height);
 			
 			if (isset($rawObject->properties) && (is_array($rawObject->properties) || is_object($rawObject->properties))) {
+				$properties = array();
 				foreach ($rawObject->properties as $rawProperty) {
 					$properties[] = Property::createFromRawObject($rawProperty);
 				}
