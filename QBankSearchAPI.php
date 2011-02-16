@@ -3,7 +3,9 @@
 	
 	require_once 'model/SearchOrder.php';
 	require_once 'model/SearchResult.php';
+	require_once 'model/Search.php';
 	require_once 'model/PropertyCriteria.php';
+	require_once 'model/PropertyRequest.php';
 	require_once 'model/SimpleObject.php';
 	require_once 'model/Object.php';
 	
@@ -75,6 +77,130 @@
 				$data['operator'] = 'AND';
 			}
 			$result = $this->call('search', $data, true);
+			if (is_array($result->data->searchResults) && !empty($result->data->searchResults)) {
+				foreach ($result->data->searchResults as $rawObject) {
+					$objects[] = SimpleObject::createFromRawObject($rawObject);
+				}
+				if ($advanced === true) {
+					foreach ($objects as $key => $object) {
+						$calls[] = array('name' => $key, 'function' => 'getobjectinformation', 'arguments' => array('objectId' => $object->getId()));
+					}
+					$result2 = $this->call('batch', array('calls' => $calls));
+					$objects = array();
+					foreach ($result2->results as $res) {
+						$objects[] = Object::createFromRawObject($res->data);
+					}
+				}
+			} else {
+				$objects = array();
+			}
+			$searchResult = new SearchResult($objects, intval($result->data->counter), $result->data->timeSearching, $result->data->step, $result->data->timeStamp, $result->data->end);
+			return $searchResult;
+		}
+		
+		/**
+		 * Executes a search in QBank.
+		 * @param Search $search
+		 * @author Björn Hjortsten
+		 * @return SearchResult
+		 */
+		public function execute(Search $search) {
+			$volatile = false;
+			$data = array();
+			$data['page'] = $search->getPage();
+			$data['pageSize'] = $search->getPageSize();
+			$data['orderBy'] = $search->getOrderBy();
+			$data['orderDirection'] = $search->getOrderDirection();
+			if ($search->isANDSearch()) {
+				$data['operator'] = 'AND';
+			} else {
+				$data['operator'] = 'OR';
+			}
+			if (!is_null($search->getCategoryId()) && $search->getCategoryId() > 0) {
+				$data['categoryId'] = $search->getCategoryId();
+			}
+			/*if ((!is_null($search->getFreeText()) && !is_empty($search->getFreeText()))
+				&& ((is_array($search->getPropertyCriterias()) && !is_empty($search->getPropertyCriterias()))
+					|| $search->getOnlyDeployed())) {
+				trigger_error('Doing workaround for freetext search.', E_USER_NOTICE);
+				$criterias = $search->getPropertyCriterias();
+				$search->emptyPropertyCriterias();
+				$search->setPage(1);
+				$search->setPageSize(PHP_INT_MAX);
+				$deployed = $search->getOnlyDeployed();
+				if (!is_empty($search->getFolderId())) {
+					$folderId = $search->getFolderId();
+					$folderRecurse = $search->getFolderRecurse();
+					$search->setFolderId(0);
+				}
+				$search->setOnlyDeployed(false);
+				$results = $this->execute($search);
+				foreach ($results as $object) {
+					$search->addObjectId($object->getId());
+				}
+				$search->setOnlyDeployed($deployed);
+				if (is_array($criterias)) { 
+					$search->addPropertyCriterias($criterias);
+				}
+				if (!empty($folderId)) {
+					$search->setFolderId($folderId, $folderRecurse);
+				}
+				$search->setFreeText(null);
+				$search->setPage($data['page']);
+				$search->setPageSize($data['pageSize']);
+			} else*/
+			if (!is_null($search->getFreeText()) && $search->getFreeText()) {
+				$data['freetext'] = $search->getFreeText();
+			}
+			if (!is_null($search->getFolderId()) && $search->getFolderId() > 0) {
+				$data['folderId'] = $search->getFolderId();
+				$data['recursive'] = $search->getFolderRecurse();
+				if ($volatile) {
+					trigger_error('Possible volatile search! You may not get the results you expect.', E_USER_WARNING);
+				}
+				$volatile = true;
+			}
+			if (!is_null($search->getMoodboardId()) && $search->getMoodboardId() > 0) {
+				$data['moodboardId'] = $search->getMoodboardId();
+				if ($volatile) {
+					trigger_error('Possible volatile search! You may not get the results you expect.', E_USER_WARNING);
+				}
+				$volatile = true;
+			}
+			if (is_array($search->getObjectIds()) && $search->getObjectIds()) {
+				$data['objectIds'] = implode(',', $search->getObjectIds());
+			}
+			if (is_array($search->getPropertyCriterias()) && $search->getPropertyCriterias()) {
+				foreach ($search->getPropertyCriterias() as $criteria) {
+					if ($criteria->getSystemName() != 'system_media_status') {
+						$data['properties'][] = array(
+							'name' 			=> $criteria->getSystemName(),
+							'value'			=> $criteria->getValue(),
+							'operator'		=> $criteria->getOperator(),
+							'forfetching'	=> $criteria->isForFetching()
+						);
+					}
+				}
+			}
+			if ($search->getOnlyDeployed()) {
+				$data['properties'][] = array(
+					'name'			=> 'system_media_status',
+					'value'			=> 'Published',
+					'operator'		=> PropertyCriteria::EQUAL,
+					'forfetching'	=> false
+				);
+			}
+			return $this->processResult($this->call('searchfrontend', $data, true), $search->getAdvancedObjects());
+		}
+		
+		/**
+		 * Processes the raw results from a QBank search and creates a {@link SearchResult}.
+		 * @param stdClass $result
+		 * @param bool $advanced Whether to populate the SearchResult with Advanced objects.
+		 * @author Björn Hjortsten
+		 * @return SearchResult
+		 */
+		protected function processResult($result, $advanced = false) {
 			if (is_array($result->data->searchResults) && !empty($result->data->searchResults)) {
 				foreach ($result->data->searchResults as $rawObject) {
 					$objects[] = SimpleObject::createFromRawObject($rawObject);
