@@ -44,6 +44,12 @@
 		protected $pdfPages;
 		
 		/**
+		 * The deployed database of text for a pdf.
+		 * @var string
+		 */
+		protected $pdfDatabase;
+		
+		/**
 		 * Creates a new DeploymentSite.
 		 * @param int $id The id of the deployment site.
 		 * @param string The name of the deployment site.
@@ -111,6 +117,15 @@
 		}
 		
 		/**
+		 * Gets the url to the deployed text database for a pdf.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
+		public function getPdfDatabase() {
+			return $this->pdfDatabase;
+		}
+		
+		/**
 		 * Creates an object from the raw object of a call to the API.
 		 * @param stdClass $rawObject
 		 * @author Björn Hjortsten
@@ -123,6 +138,9 @@
 			$siteInfo->thumbnail = strval($rawObject->thumbnail);
 			foreach ($rawObject->pages as $page) {
 				$siteInfo->pdfPages[] = strval($page);
+			}
+			if (@$rawObject->database) {
+				$siteInfo->pdfDatabase = $rawObject->database;
 			}
 			return $siteInfo;
 		}
