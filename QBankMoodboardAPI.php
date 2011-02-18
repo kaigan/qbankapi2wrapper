@@ -67,6 +67,7 @@
 			} else {
 				$data['expirationDate'] = strftime('%F', strtotime($expirationDate));
 			}
+			var_dump($data['expirationDate']);
 			if ($data['expirationDate'] === false) {
 				throw new InvalidArgumentException($expirationDate.' is not a valid date!');
 			}
@@ -93,7 +94,7 @@
 				$data['notes'] = strval($notes);
 			}
 			$result = $this->call('createmoodboard', $data, true);
-			return new Moodboard($result->moodboard->moodboardId, $result->moodboard->moodboardName, $result->moodboard->expireDate);
+			return Moodboard::createFromRawObject($result->moodboard);
 		}
 		
 		/**
