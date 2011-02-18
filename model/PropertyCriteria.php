@@ -74,5 +74,33 @@
 		public function isForFetching() {
 			return $this->forfetching;
 		}
+		
+		/**
+		 * Compares this PropertyCriteria to anything else to see if it is an equal.
+		 * @param mixed $var The parameter to check against.
+		 * @author Björn Hjortsten
+		 * @return bool True if they are equal, false if not.
+		 */
+		public function equals($var) {
+			if (!is_a($var, 'PropertyCriteria')) {
+				return false;
+			}
+			if ($var->getSystemName() != $this->systemName) {
+				return false;
+			}
+			if ($var->isForFetching() !== $this->forfetching) {
+				return false;
+			}
+			if ($var->isForFetching() === true) {
+				return true;
+			}
+			if ($var->getOperator() != $this->operator) {
+				return false;
+			}
+			if ($var->getValue() != $this->value) {
+				return false;
+			}
+			return true;
+		}
 	}
 ?>

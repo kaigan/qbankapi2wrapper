@@ -344,6 +344,7 @@
 		
 		/**
 		 * Adds a {@link PropertyCriteria} to the search.
+		 * Note: Will replace any equal PropertyCriteria already added.
 		 * @param PropertyCriteria $criteria
 		 * @author Björn Hjortsten
 		 * @return void
@@ -352,22 +353,31 @@
 			if (!is_array($this->propertyCriterias)) {
 				$this->propertyCriterias = array();
 			}
-			$this->propertyCriterias[] = $criteria;
+			$replaced = false;
+			foreach ($this->propertyCriterias as &$crit) {
+				if ($crit->equals($criteria)) {
+					$crit = $criteria;
+					$replaced = true;
+					break;
+				}
+			}
+			unset($crit);
+			if (!$replaced) {
+				$this->propertyCriterias[] = $criteria;
+			}
 		}
 		
 		/**
 		 * Adds several {@link PropertyCriteria}s to the search.
+		 * Note: Will replace any equal PropertyCriteria already added.
 		 * @param array $criterias
 		 * @author Björn Hjortsten
 		 * @return void
 		 */
 		public function addPropertyCriterias(array $criterias) {
-			if (!is_array($this->propertyCriterias)) {
-				$this->propertyCriterias = array();
-			}
 			foreach ($criterias as $criteria) {
 				if (get_class($criteria) == 'PropertyCriteria' || is_subclass_of($criteria, 'PropertyCriteria')) {
-					$this->propertyCriterias[] = $criteria;
+					$this->addPropertyCriteria($criteria);
 				} else {
 					trigger_error('Skipping value: '.$criteria.'. Not a valid PropertyCriteria! ('.get_class($criteria).')');
 				}

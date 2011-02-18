@@ -20,7 +20,7 @@
 			$result = $this->call('getmoodboards', array());
 			if (is_array($result->moodboards) && !empty($result->moodboards)) {
 				foreach ($result->moodboards as $moodboard) {
-					$moodboards[$moodboard->moodboardName] = new Moodboard($moodboard->moodboardId, $moodboard->moodboardName, $moodboard->expireDate);
+					$moodboards[$moodboard->moodboardName] = Moodboard::createFromRawObject($moodboard);
 				}
 			}
 			return $moodboards;
@@ -94,6 +94,16 @@
 			}
 			$result = $this->call('createmoodboard', $data, true);
 			return new Moodboard($result->moodboard->moodboardId, $result->moodboard->moodboardName, $result->moodboard->expireDate);
+		}
+		
+		/**
+		 * Gets a url to a Moodboard.
+		 * @param Moodboard $moodboard
+		 * @author Björn Hjortsten
+		 * @return string An url.
+		 */
+		public function getMoodboardUrl(Moodboard $moodboard) {
+			return 'http://'.$this->qbankAddress.'/v2.6/mb.php?h='.$moodboard->getHash().'&amp;r=y';
 		}
 	}
 ?>
