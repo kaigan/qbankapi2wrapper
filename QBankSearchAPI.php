@@ -119,36 +119,6 @@
 			if (!is_null($search->getCategoryId()) && $search->getCategoryId() > 0) {
 				$data['categoryId'] = $search->getCategoryId();
 			}
-			/*if ((!is_null($search->getFreeText()) && !is_empty($search->getFreeText()))
-				&& ((is_array($search->getPropertyCriterias()) && !is_empty($search->getPropertyCriterias()))
-					|| $search->getOnlyDeployed())) {
-				trigger_error('Doing workaround for freetext search.', E_USER_NOTICE);
-				$criterias = $search->getPropertyCriterias();
-				$search->emptyPropertyCriterias();
-				$search->setPage(1);
-				$search->setPageSize(PHP_INT_MAX);
-				$deployed = $search->getOnlyDeployed();
-				if (!is_empty($search->getFolderId())) {
-					$folderId = $search->getFolderId();
-					$folderRecurse = $search->getFolderRecurse();
-					$search->setFolderId(0);
-				}
-				$search->setOnlyDeployed(false);
-				$results = $this->execute($search);
-				foreach ($results as $object) {
-					$search->addObjectId($object->getId());
-				}
-				$search->setOnlyDeployed($deployed);
-				if (is_array($criterias)) { 
-					$search->addPropertyCriterias($criterias);
-				}
-				if (!empty($folderId)) {
-					$search->setFolderId($folderId, $folderRecurse);
-				}
-				$search->setFreeText(null);
-				$search->setPage($data['page']);
-				$search->setPageSize($data['pageSize']);
-			} else*/
 			if (!is_null($search->getFreeText()) && $search->getFreeText()) {
 				$data['freetext'] = $search->getFreeText();
 			}
@@ -156,6 +126,7 @@
 				$data['folderId'] = $search->getFolderId();
 				$data['recursive'] = $search->getFolderRecurse();
 				if ($volatile) {
+					// Volatile since folders and moodboards collide
 					trigger_error('Possible volatile search! You may not get the results you expect.', E_USER_WARNING);
 				}
 				$volatile = true;
@@ -163,6 +134,7 @@
 			if (!is_null($search->getMoodboardId()) && $search->getMoodboardId() > 0) {
 				$data['moodboardId'] = $search->getMoodboardId();
 				if ($volatile) {
+					// Volatile since folders and moodboards collide
 					trigger_error('Possible volatile search! You may not get the results you expect.', E_USER_WARNING);
 				}
 				$volatile = true;

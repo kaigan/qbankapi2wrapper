@@ -67,7 +67,6 @@
 			} else {
 				$data['expirationDate'] = strftime('%F', strtotime($expirationDate));
 			}
-			var_dump($data['expirationDate']);
 			if ($data['expirationDate'] === false) {
 				throw new InvalidArgumentException($expirationDate.' is not a valid date!');
 			}
