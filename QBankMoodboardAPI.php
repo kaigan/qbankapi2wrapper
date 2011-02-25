@@ -12,6 +12,7 @@
 		
 		/**
 		 * Gets all the Moodboards from QBank.
+		 * @throws CommunicationException Thrown if something went wrong while getting the image template.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
 		 * @return array An array of {@link Moodboard}s. Null if there are no results.
@@ -28,6 +29,7 @@
 		
 		/**
 		 * Gets all the templates for Moodboards from QBank.
+		 * @throws CommunicationException Thrown if something went wrong while getting the image template.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
 		 * @return array An array where the key is the id and the value is the name of the Moodboard.
@@ -55,6 +57,8 @@
 		 * @param string $footerText Some text to display after the content of the moodboard.
 		 * @param string $notes Private notes about the moodboard.
 		 * @throws InvalidArgumentException Thrown if $expirationDate is not a valid date.
+		 * @throws CommunicationException Thrown if something went wrong while getting the image template.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
 		 * @return Moodboard The newly created Moodboard.
 		 */
@@ -95,6 +99,21 @@
 			$result = $this->call('createmoodboard', $data, true);
 			return Moodboard::createFromRawObject($result->moodboard);
 		}
+		
+		/**
+		 * Adds objects to a Moodboard
+		 * @param int $moodboardId The Moodboard that the objects should be added to.
+		 * @param array $objectIds An array of integers. The objects to add.
+		 * @throws CommunicationException Thrown if something went wrong while getting the image template.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
+		public function addToMoodboard($moodboardId, array $objectIds) {
+			$data['moodboardId'] = intval($moodboardId);
+			$data['objectIds'] = $objectIds;
+			$this->call('addtomoodboard', $data);
+		} 
 		
 		/**
 		 * Gets a url to a Moodboard.
