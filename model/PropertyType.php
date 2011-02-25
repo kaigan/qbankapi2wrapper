@@ -36,6 +36,12 @@
 		protected $propertyValueType;
 		
 		/**
+		 * The original value type that was set in QBank.
+		 * @var mixed
+		 */
+		protected $qbankValueType;
+		
+		/**
 		 * The default value of the property.
 		 * @var mixed
 		 */
@@ -142,6 +148,15 @@
 		public function getPropertyValueType() {
 			return $this->propertyValueType;
 		}
+		
+		/**
+		 * Gets the value type as defined in QBank.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
+		public function getQBankValueType() {
+			return $this->qbankValueType;
+		} 
 		
 		/**
 		 * If this propertys value are multiple values.
@@ -267,6 +282,7 @@
 			}
 			$property = new PropertyType(intval($rawProperty->id), $rawProperty->propertyName, $rawProperty->title, 
 									   $value, $defaultValue, $propertyValueType, (bool) $rawProperty->multiplechoice, (bool) $rawProperty->editable);
+			$property->qbankValueType = $rawProperty->propertyType;
 			if (isset($rawProperty->editable)) {
 				$property->editable = (bool) $rawProperty->editable;
 			} else {
