@@ -185,6 +185,22 @@
 		}
 		
 		/**
+		 * Gets all {@link Category}(ies) from QBank.
+		 * @author Björn Hjortsten
+		 * @return array An array of {@link Category}.
+		 */
+		public function getCategories() {
+			$results = $this->call('getcategories', array());
+			$categories = array();
+			if (is_array($results->categories)) {
+				foreach ($results->categories as $result) {
+					$categories[] = new Category($result->id, $result->name);
+				}
+			}
+			return $categories;
+		}
+		
+		/**
 		 * Gets a property type from QBank.
 		 * @param string $systemName The name of the property type.
 		 * @throws CommunicationException Thrown if something went wrong while getting the property type.
@@ -210,10 +226,9 @@
 			if (is_array($param)) {
 				$data['propertyTypeNames'] = $param;
 			} elseif (is_numeric($param)) {
-				//TODO fetch all from category
-				$data[''] = $param;
+				$data['categoryId'] = intval($param);
 			} else {
-				//TODO fetch all
+				// Don't send anything to get everything!
 			}
 			$result = $this->call('getPropertyTypes', $data);
 			foreach ($result->propertyTypes as $propertyType) {
