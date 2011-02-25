@@ -106,6 +106,85 @@
 		}
 		
 		/**
+		 * Uploads a new file to QBank.
+		 * @param int $categoryId The category that the object should belong to.
+		 * @param string $name The name of the new object.
+		 * @param string $pathToFile The path to the file to upload.
+		 * @param array $properties An array of {@link PropertyBase}s. Defines proåerty values of the new object.
+		 * @throws InvalidArgumentException Thrown if $categoryId is not a number or if $pathToFile is invalid.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @throws CommunicationException Thrown if something went wrong while communicating with QBank.
+		 * @author Björn Hjortsten
+		 * @return Object The newly created object in QBank.
+		 */
+		public function upload($categoryId, $name, $pathToFile, array $properties = null) {
+			$function = 'createobject';
+			if (!is_numeric($categoryId)) {
+				throw new InvalidArgumentException('Category id is not a number!');
+			}
+			$path = realpath($pathToFile);
+			if (!is_file($path)) {
+				throw new InvalidArgumentException('The supplied path "'.$pathToFile.'" is not a path to a file!');
+			}
+			if (!is_readable($path)) {
+				throw new InvalidArgumentException('The supplied path "'.$pathToFile.'" is not readable!');
+			}
+			$data['hash'] = $this->hash;
+			$data['categoryId'] = intval($categoryId);
+			$data['name'] = strval($name);
+			if (is_array($properties)) {
+				$props = array();
+				foreach ($properties as $property) {
+					if (is_a($property, 'PropertyBase')) {
+						$props[$property->getSystemName()] = $property->getValue();
+					} else {
+						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->qbankAddress.'/'.$function, 'Skipping bad value '.@strval($property)), 3, QBankAPI::CALLS_LOG);
+					}
+				}
+				if (!empty($props)) {
+					$data['properties'] = $props;
+				}
+			}
+			$json = json_encode($data);
+			$data = array(
+				'data' => $json,
+				'userfile' => '@'.$path
+			);
+			$url = sprintf('%s/%s/%s', $this->apiAddress, $this->qbankAddress, $function);
+			curl_setopt($this->curlHandle, CURLOPT_URL, $url);
+			curl_setopt($this->curlHandle, CURLOPT_POST, true);
+			curl_setopt($this->curlHandle, CURLOPT_POSTFIELDS, $data);
+			curl_setopt($this->curlHandle, CURLOPT_FOLLOWLOCATION, true);
+			curl_setopt($this->curlHandle, CURLOPT_FAILONERROR, true);
+			curl_setopt($this->curlHandle, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($this->curlHandle, CURLOPT_TIMEOUT, $this->requestTimeout);
+			if ($this->useSSL === true) {
+				curl_setopt($this->curlHandle, CURLOPT_SSL_VERIFYPEER, false);
+			}
+			curl_setopt($this->curlHandle, CURLOPT_USERAGENT, 'QBankAPIWrapper '.QBankAPI::VERSION);
+			error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'UPLOAD', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
+			$resultJSON = curl_exec($this->curlHandle);
+			if ($resultJSON === false) {
+				$error = sprintf('Error while comunicating with QBank: %s', curl_error($this->curlHandle));
+				curl_close($this->curlHandle);
+				$this->curlHandle = curl_init();
+				throw new ConnectionException($error, curl_errno($this->curlHandle));
+			}
+			$result = json_decode($resultJSON);
+			if (!isset($result->success) || $result->success === false) {
+				if (isset($result->error)) {
+					error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
+					throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
+				} else {
+					error_log(sprintf('[%s] (%s) %s: %s'."\n\t".'Response: %s'."\n", date('Y-m-d H:i:s'), 'UNKNOWN ERROR', $this->qbankAddress.'/'.$function, $json, $resultJSON), 3, QBankAPI::UNKNOWNS_LOG);
+					throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error. Please note the time and report this to support@kaigantbk.se', 99, 'UnknownError');
+				}
+			}
+			$object = $this->getObject($result->objectId);
+			return $object;
+		}
+		
+		/**
 		 * Gets a property type from QBank.
 		 * @param string $systemName The name of the property type.
 		 * @throws CommunicationException Thrown if something went wrong while getting the property type.

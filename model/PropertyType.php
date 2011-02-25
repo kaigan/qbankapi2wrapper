@@ -1,5 +1,6 @@
 <?php
 	require_once 'model/PropertyValueType.php';
+	require_once 'model/PropertyBase.php';
 	
 	/**
 	 * Represents a QBank property type.
@@ -7,19 +8,13 @@
 	 * @copyright Kaigan TBK 2010
 	 * @package QBankAPIWrapper
 	 */
-	class PropertyType {
+	class PropertyType extends PropertyBase{
 		
 		/**
 		 * The id of the propertys type.
 		 * @var int
 		 */
 		protected $propertyTypeId;
-		
-		/**
-		 * The system name of the property.
-		 * @var string
-		 */
-		protected $systemName;
 		
 		/**
 		 * The display name of the property.
@@ -53,12 +48,6 @@
 		protected $multipleChoice;
 		
 		/**
-		 * The value of the property.
-		 * @var bool
-		 */
-		protected $value;
-		
-		/**
 		 * If setting of the property is mandatory.
 		 * @var mixed
 		 */
@@ -84,7 +73,7 @@
 		protected $info;
 		
 		/**
-		 * Creates a new property.
+		 * Creates a new property type.
 		 * @param int $id The id of the property.
 		 * @param int $propertyTypeId The id of the propertys type.
 		 * @param string $systemName The system name of the property.
@@ -99,10 +88,9 @@
 		 */
 		public function __construct($propertyTypeId, $systemName, $title, $value, $defaultValue = null, 
 									$propertyValueType = PropertyValueType::QB_String, $multipleChoice = false, $editable = true) {
+			parent::__construct($systemName, $value);
 			$this->propertyTypeId = $propertyTypeId;
-			$this->systemName = $systemName;
 			$this->title = $title;
-			$this->value = $value;
 			$this->defaultValue = $defaultValue;
 			$this->propertyValueType = $propertyValueType;
 			$this->multipleChoice = $multipleChoice;
@@ -137,19 +125,9 @@
 		}
 		
 		/**
-		 * Gets the value of the property.
-		 * @author Björn Hjortsten
-		 * @return mixed The value of the property or NULL if there is no value. May be any type. {@link Property::getPropertyValueType()} specifies the type.
-		 * @see PropertyValueType
-		 */
-		public function getValue() {
-			return $this->value;
-		}
-		
-		/**
 		 * Gets the default value of the property.
 		 * @author Björn Hjortsten
-		 * @return mixed May be any type. {@link Property::getPropertyValueType()} specifies the type.
+		 * @return mixed May be any type. {@link PropertyType::getPropertyValueType()} specifies the type.
 		 * @see PropertyValueType
 		 */
 		public function getDefaultValue() {

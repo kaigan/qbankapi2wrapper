@@ -208,7 +208,7 @@
 		 */
 		public function setMoodboardId($id) {
 			if (!is_numeric($id)) {
-				throw new InvalidArgumentException('The Moodboard id must be a number');
+				throw new InvalidArgumentException('The Moodboard id must be a number. You said "'.$id.'"');
 			}
 			$this->moodboardId = intval($id);
 		}
