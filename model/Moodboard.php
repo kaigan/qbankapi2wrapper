@@ -97,22 +97,47 @@
 			return $this->expirationDate;
 		}
 		
+		/**
+		 * Gets the identifying hash of the moodboard.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
 		public function getHash() {
 			return $this->hash;
 		}
 		
+		/**
+		 * Gets the time of creation of the moodboard.
+		 * @author Björn Hjortsten
+		 * @return int
+		 */
 		public function getCreationTime() {
 			return $this->creationTime;
 		}
 		
+		/**
+		 * Gets the moodboards header text.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
 		public function getHeaderText() {
 			return $this->headerText;
 		}
 		
+		/**
+		 * Gets the moodboards footer text.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
 		public function getFooterText() {
 			return $this->footerText;
 		}
 		
+		/**
+		 * Gets the moodboards notes.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
 		public function getNotes() {
 			return $this->notes;
 		}
