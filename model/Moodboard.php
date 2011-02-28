@@ -39,6 +39,24 @@
 		protected $creationTime;
 		
 		/**
+		 * Some header text.
+		 * @var string
+		 */
+		protected $headerText;
+		
+		/**
+		 * Some footer text
+		 * @var string
+		 */
+		protected $footerText;
+		
+		/**
+		 * Notes about the moodboard.
+		 * @var string
+		 */
+		protected $notes;
+		
+		/**
 		 * Creates a new Moodboard.
 		 * @param int $id The Moodboards id.
 		 * @param string $name The Moodboards name.
@@ -87,6 +105,18 @@
 			return $this->creationTime;
 		}
 		
+		public function getHeaderText() {
+			return $this->headerText;
+		}
+		
+		public function getFooterText() {
+			return $this->footerText;
+		}
+		
+		public function getNotes() {
+			return $this->notes;
+		}
+		
 		/**
 		 * Creates a Mooboard from an object directly from a call to the API.
 		 * WARNING: If this is called with the wrong raw object, you may get warnings or even errors!
@@ -98,6 +128,9 @@
 			$moodboard = new Moodboard($rawObject->moodboardId, $rawObject->moodboardName, $rawObject->expireDate);
 			$moodboard->hash = strval($rawObject->hash);
 			$moodboard->creationTime = strtotime($rawObject->createdDate);
+			$moodboard->headerText = strval(trim($rawObject->headerText));
+			$moodboard->footerText = strval(trim($rawObject->footerText));
+			$moodboard->notes = strval(trim($rawObject->notes));
 			return $moodboard;
 		}
 	}

@@ -103,7 +103,7 @@
 			}
 			$property = new Property(intval($rawProperty->propertyId), intval($rawProperty->id), $rawProperty->propertyName, $rawProperty->title, 
 									   $value, $defaultValue, $propertyValueType, (bool) $rawProperty->multiplechoice, (bool) $rawProperty->editable);
-			$property->qbankValueType = $rawProperty->propertType;
+			@$property->qbankValueType = $rawProperty->propertyType;
 			if (isset($rawProperty->editable)) {
 				$property->editable = (bool) $rawProperty->editable;
 			} else {
