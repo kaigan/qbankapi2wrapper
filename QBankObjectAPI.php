@@ -203,6 +203,7 @@
 		/**
 		 * Gets a property type from QBank.
 		 * @param string $systemName The name of the property type.
+		 * @throws PropertyException Thrown if the property type does not exist.
 		 * @throws CommunicationException Thrown if something went wrong while getting the property type.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
@@ -210,6 +211,9 @@
 		 */
 		public function getPropertyType($systemName) {
 			$result = $this->getPropertyTypes(array($systemName));
+			if ($result[$systemName]) {
+				throw new PropertyException('The specified property does not exist!');
+			}
 			return $result[$systemName];
 		}
 		
@@ -231,7 +235,11 @@
 				// Don't send anything to get everything!
 			}
 			$result = $this->call('getPropertyTypes', $data);
-			foreach ($result->propertyTypes as $propertyType) {
+			foreach ($result->propertyTypes as $propertyName => $propertyType) {
+				if (empty($propertyType)) {
+					trigger_error('Skipping property type "'.$propertyName.'". Probably does not exist.', 'warning');
+					continue;
+				}
 				$propertyTypes[$propertyType->propertyName] = PropertyType::createFromRawObject($propertyType);
 			}
 			return $propertyTypes;
