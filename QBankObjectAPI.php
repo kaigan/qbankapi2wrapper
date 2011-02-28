@@ -211,7 +211,7 @@
 		 */
 		public function getPropertyType($systemName) {
 			$result = $this->getPropertyTypes(array($systemName));
-			if ($result[$systemName]) {
+			if (empty($result[$systemName])) {
 				throw new PropertyException('The specified property does not exist!');
 			}
 			return $result[$systemName];
