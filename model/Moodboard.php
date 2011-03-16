@@ -57,6 +57,12 @@
 		protected $notes;
 		
 		/**
+		 * The email address to which notices about the moodboard should be sent.
+		 * @var string
+		 */
+		protected $email; 
+		
+		/**
 		 * Creates a new Moodboard.
 		 * @param int $id The Moodboards id.
 		 * @param string $name The Moodboards name.
@@ -143,6 +149,15 @@
 		}
 		
 		/**
+		 * Gets the email address to which notices about the moodboard should be sent.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
+		public function getEmail() {
+			return $this->email;
+		}
+		
+		/**
 		 * Creates a Mooboard from an object directly from a call to the API.
 		 * WARNING: If this is called with the wrong raw object, you may get warnings or even errors!
 		 * @param stdClass $rawObject
@@ -156,6 +171,7 @@
 			$moodboard->headerText = strval(trim($rawObject->headerText));
 			$moodboard->footerText = strval(trim($rawObject->footerText));
 			$moodboard->notes = strval(trim($rawObject->notes));
+			$moodboard->email = strval(trim($rawObject->email));
 			return $moodboard;
 		}
 	}
