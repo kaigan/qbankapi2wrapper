@@ -93,7 +93,7 @@
 		
 		/**
 		 * Gets the original media direct from QBank.
-		 * NOTE: This will prompt the user to download the original media.
+		 * NOTE: If the type is "original", this will prompt the user to download the original media.
 		 * WARNING: Will send a http-header.
 		 * @internal This will work even when an object is not deployed.
 		 * @param int $mediaId The mediaId of the object to fetch the original media.
@@ -101,8 +101,18 @@
 		 * @author Björn Hjortsten
 		 * @return void
 		 */
-		public function getMedia($mediaId, $type = 'original') {
-			header(sprintf('Location: %s/%s/getMedia?hash=%s&id=%d&type=%s', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId, $type));
+		public function getMedia($mediaId, $type = 'original', $redirect = true) {
+			if (is_numeric($type)) {
+				$type = intval($type);
+				$url = sprintf('%s/%s/getMedia?hash=%s&id=%d&templateId=%d', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId, $type);
+			} else {
+				$url = sprintf('%s/%s/getMedia?hash=%s&id=%d&type=%s', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId, $type);
+			}
+			if ($redirect == true) {
+				header('Location: '.$url);
+			} else {
+				return $url;
+			}
 		}
 		
 		/**
@@ -263,8 +273,10 @@
 					} else {
 						$aspect = implode(':', $aspect);
 					}
-					$templates[$template->templatename] = new ImageTemplate(strval($template->templatename), intval($template->width), intval($template->height), strval($template->filetype),
+					$tmp = new ImageTemplate(strval($template->templatename), intval($template->width), intval($template->height), strval($template->filetype),
 																			$aspect, intval($template->quality), intval($template->resolution));
+					$tmp->setId(intval($template->templateId));
+					$templates[$template->templatename] = $tmp;
 				}
 			}
 			return $templates;

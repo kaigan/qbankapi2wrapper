@@ -8,6 +8,7 @@
 	 */
 	class ImageTemplate {
 		
+		protected $id;
 		protected $name;
 		protected $maxWidth;
 		protected $maxHeight;
@@ -36,6 +37,15 @@
 			$this->dpi = $dpi;
 			$this->aspectRatio = $aspectRatio;
 			$this->quality = $quality;
+		}
+		
+		/**
+		 * Gets the id of the image template.
+		 * @author Björn Hjortsten
+		 * return int
+		 */
+		public function getId() {
+			return $this->id;
 		}
 		
 		/**
@@ -100,6 +110,15 @@
 		 */
 		public function getQuality() {
 			return $this->quality;
+		}
+		
+		/**
+		 * Sets the id of the template.
+		 * @param int $id
+		 * @author Björn Hjortsten
+		 */
+		public function setId($id) {
+			$this->id = intval($id);
 		}
 	}
 ?>
