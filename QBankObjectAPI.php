@@ -142,18 +142,9 @@
 			$data['hash'] = $this->hash;
 			$data['categoryId'] = intval($categoryId);
 			$data['name'] = strval($name);
-			if (is_array($properties)) {
-				$props = array();
-				foreach ($properties as $property) {
-					if (is_a($property, 'PropertyBase')) {
-						$props[$property->getSystemName()] = $property->getValue();
-					} else {
-						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->qbankAddress.'/'.$function, 'Skipping bad value '.@strval($property)), 3, QBankAPI::CALLS_LOG);
-					}
-				}
-				if (!empty($props)) {
-					$data['properties'] = $props;
-				}
+			$properties = $this->prepareProperties($properties);
+			if (!empty($properties)) {
+				$data['properties'] = $properties;
 			}
 			$json = json_encode($data);
 			$data = array(
@@ -192,6 +183,25 @@
 			}
 			$object = $this->getObject($result->objectId);
 			return $object;
+		}
+		
+		public function saveProperties($objectId, array $properties, $languageId = null) {
+			if (!is_numeric($objectId)) {
+				throw new InvalidArgumentException('Object id is not a number!');
+			}
+			$data['objectId'] = intval($objectId);
+			$properties = $this->prepareProperties($properties);
+			if (!empty($properties)) {
+				$data['properties'] = $properties;
+			}
+			if ($languageId != null) {
+				if (!is_numeric($languageId)) {
+					throw new InvalidArgumentException('Language id is not numeric!');
+				}
+				$data['languageId'] = intval($languageId);
+			}
+			$this->call('editobject', $data);
+			return $this->getObject($objectId);
 		}
 		
 		/**
@@ -315,6 +325,20 @@
 				}
 			}
 			return $siteInfo;
+		}
+		
+		private function prepareProperties(array $properties) {
+			if (is_array($properties)) {
+				$props = array();
+				foreach ($properties as $property) {
+					if (is_a($property, 'PropertyBase')) {
+						$props[$property->getSystemName()] = $property->getValue();
+					} else {
+						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->qbankAddress.'/'.$function, 'Skipping bad value '.@strval($property)), 3, QBankAPI::CALLS_LOG);
+					}
+				}
+				return $props;
+			}
 		}
 	}
 ?>
