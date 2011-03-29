@@ -185,6 +185,18 @@
 			return $object;
 		}
 		
+		/**
+		 * Save values to properties.
+		 * Remember: With great power comes great responsibility.
+		 * @param int $objectId The id of the object.
+		 * @param array $properties An array of {@link PropertyBase}s.
+		 * @param int $languageId The id of the language the values are in.
+		 * @throws InvalidArgumentException Thrown if Either the objectId or languageId is not numeric.
+		 * @throws CommunicationException Thrown if something went wrong while getting the property type.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @author Björn Hjortsten
+		 * @return Object The object with the new property values set.
+		 */
 		public function saveProperties($objectId, array $properties, $languageId = null) {
 			if (!is_numeric($objectId)) {
 				throw new InvalidArgumentException('Object id is not a number!');
@@ -327,6 +339,12 @@
 			return $siteInfo;
 		}
 		
+		/**
+		 * Encodes an array of {@link PropertyBase}s for transmission to the API.
+		 * @param array $properties The array to be encoded.
+		 * @author Björn Hjortsten
+		 * @return array An array ready for transport.
+		 */
 		private function prepareProperties(array $properties) {
 			if (is_array($properties)) {
 				$props = array();
