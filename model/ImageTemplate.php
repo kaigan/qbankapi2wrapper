@@ -8,6 +8,7 @@
 	 */
 	class ImageTemplate {
 		
+		protected $id;
 		protected $name;
 		protected $maxWidth;
 		protected $maxHeight;
@@ -39,6 +40,15 @@
 		}
 		
 		/**
+		 * Gets the id of the image template.
+		 * @author Björn Hjortsten
+		 * return int
+		 */
+		public function getId() {
+			return $this->id;
+		}
+		
+		/**
 		 * Gets the name of the image template.
 		 * @author Björn Hjortsten
 		 * return string
@@ -61,7 +71,7 @@
 		 * @author Björn Hjortsten
 		 * @return int
 		 */
-		public function getMaxHeigth() {
+		public function getMaxHeight() {
 			return $this->maxHeight;
 		}
 		
@@ -100,6 +110,15 @@
 		 */
 		public function getQuality() {
 			return $this->quality;
+		}
+		
+		/**
+		 * Sets the id of the template.
+		 * @param int $id
+		 * @author Björn Hjortsten
+		 */
+		public function setId($id) {
+			$this->id = intval($id);
 		}
 	}
 ?>

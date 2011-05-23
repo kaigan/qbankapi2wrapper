@@ -3,6 +3,7 @@
 	
 	require_once 'model/Object.php';
 	require_once 'model/ImageTemplate.php';
+	require_once 'model/DeploymentSite.php';
 	
 	/**
 	 * Provides functionality for objects in QBank.
@@ -68,17 +69,16 @@
     		}
     		set_time_limit(0);
     		
-    		if (strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
+    		/*if (strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
         		$filename = preg_replace('/\./', '%2e', $name, substr_count($filename, '.') - 1);
-    		}
+    		}*/
     		
-    		header('Cache-Control: ');
-		    header('Pragma: ');
-		    header('Content-Type: '.$mimetype);
-		    header('Content-Length: ' .(string)(filesize($pathToFile)) );
 		    header('Content-Disposition: attachment; filename="'.$filename.'"');
-		    header('Content-Transfer-Encoding: binary'."\n");
+		    error_log("$realPath");
+			header('X-SendFile: '.$realPath);
+			die;
 		    
+			/*
 		    if ($fileHandle = fopen($pathToFile, 'rb')) {
 		        while ((!feof($fileHandle)) && (connection_status() == 0)) {
 		            print(fread($fileHandle, 1024*8));
@@ -86,13 +86,14 @@
 		        }
 		        fclose($fileHandle);
 		    }
+		    */
 		    
 		    return ((connection_status() == 0) and !connection_aborted());
 		}
 		
 		/**
 		 * Gets the original media direct from QBank.
-		 * NOTE: This will prompt the user to download the original media.
+		 * NOTE: If the type is "original", this will prompt the user to download the original media.
 		 * WARNING: Will send a http-header.
 		 * @internal This will work even when an object is not deployed.
 		 * @param int $mediaId The mediaId of the object to fetch the original media.
@@ -100,13 +101,141 @@
 		 * @author Björn Hjortsten
 		 * @return void
 		 */
-		public function getMedia($mediaId, $type = 'original') {
-			header(sprintf('Location: %s/%s/getMedia?hash=%s&id=%d&type=%s', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId, $type));
+		public function getMedia($mediaId, $type = 'original', $redirect = true) {
+			if (is_numeric($type)) {
+				$type = intval($type);
+				$url = sprintf('%s/%s/getMedia?hash=%s&id=%d&templateId=%d', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId, $type);
+			} else {
+				$url = sprintf('%s/%s/getMedia?hash=%s&id=%d&type=%s', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId, $type);
+			}
+			if ($redirect == true) {
+				header('Location: '.$url);
+			} else {
+				return $url;
+			}
+		}
+		
+		/**
+		 * Uploads a new file to QBank.
+		 * @param int $categoryId The category that the object should belong to.
+		 * @param string $name The name of the new object.
+		 * @param string $pathToFile The path to the file to upload.
+		 * @param array $properties An array of {@link PropertyBase}s. Defines proåerty values of the new object.
+		 * @throws InvalidArgumentException Thrown if $categoryId is not a number or if $pathToFile is invalid.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @throws CommunicationException Thrown if something went wrong while communicating with QBank.
+		 * @author Björn Hjortsten
+		 * @return Object The newly created object in QBank.
+		 */
+		public function upload($categoryId, $name, $pathToFile, array $properties = null) {
+			$function = 'createobject';
+			if (!is_numeric($categoryId)) {
+				throw new InvalidArgumentException('Category id is not a number!');
+			}
+			$path = realpath($pathToFile);
+			if (!is_file($path)) {
+				throw new InvalidArgumentException('The supplied path "'.$pathToFile.'" is not a path to a file!');
+			}
+			if (!is_readable($path)) {
+				throw new InvalidArgumentException('The supplied path "'.$pathToFile.'" is not readable!');
+			}
+			$data['hash'] = $this->hash;
+			$data['categoryId'] = intval($categoryId);
+			$data['name'] = strval($name);
+			$properties = $this->prepareProperties($properties);
+			if (!empty($properties)) {
+				$data['properties'] = $properties;
+			}
+			$json = json_encode($data);
+			$data = array(
+				'data' => $json,
+				'userfile' => '@'.$path
+			);
+			$url = sprintf('%s/%s/%s', $this->apiAddress, $this->qbankAddress, $function);
+			curl_setopt($this->curlHandle, CURLOPT_URL, $url);
+			curl_setopt($this->curlHandle, CURLOPT_POST, true);
+			curl_setopt($this->curlHandle, CURLOPT_POSTFIELDS, $data);
+			curl_setopt($this->curlHandle, CURLOPT_FOLLOWLOCATION, true);
+			curl_setopt($this->curlHandle, CURLOPT_FAILONERROR, true);
+			curl_setopt($this->curlHandle, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($this->curlHandle, CURLOPT_TIMEOUT, $this->requestTimeout);
+			if ($this->useSSL === true) {
+				curl_setopt($this->curlHandle, CURLOPT_SSL_VERIFYPEER, false);
+			}
+			curl_setopt($this->curlHandle, CURLOPT_USERAGENT, 'QBankAPIWrapper '.QBankAPI::VERSION);
+			error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'UPLOAD', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
+			$resultJSON = curl_exec($this->curlHandle);
+			if ($resultJSON === false) {
+				$error = sprintf('Error while comunicating with QBank: %s', curl_error($this->curlHandle));
+				curl_close($this->curlHandle);
+				$this->curlHandle = curl_init();
+				throw new ConnectionException($error, curl_errno($this->curlHandle));
+			}
+			$result = json_decode($resultJSON);
+			if (!isset($result->success) || $result->success === false) {
+				if (isset($result->error)) {
+					error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
+					throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
+				} else {
+					error_log(sprintf('[%s] (%s) %s: %s'."\n\t".'Response: %s'."\n", date('Y-m-d H:i:s'), 'UNKNOWN ERROR', $this->qbankAddress.'/'.$function, $json, $resultJSON), 3, QBankAPI::UNKNOWNS_LOG);
+					throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error. Please note the time and report this to support@kaigantbk.se', 99, 'UnknownError');
+				}
+			}
+			$object = $this->getObject($result->objectId);
+			return $object;
+		}
+		
+		/**
+		 * Save values to properties.
+		 * Remember: With great power comes great responsibility.
+		 * @param int $objectId The id of the object.
+		 * @param array $properties An array of {@link PropertyBase}s.
+		 * @param int $languageId The id of the language the values are in.
+		 * @throws InvalidArgumentException Thrown if Either the objectId or languageId is not numeric.
+		 * @throws CommunicationException Thrown if something went wrong while getting the property type.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @author Björn Hjortsten
+		 * @return Object The object with the new property values set.
+		 */
+		public function saveProperties($objectId, array $properties, $languageId = null) {
+			if (!is_numeric($objectId)) {
+				throw new InvalidArgumentException('Object id is not a number!');
+			}
+			$data['objectId'] = intval($objectId);
+			$properties = $this->prepareProperties($properties);
+			if (!empty($properties)) {
+				$data['properties'] = $properties;
+			}
+			if ($languageId != null) {
+				if (!is_numeric($languageId)) {
+					throw new InvalidArgumentException('Language id is not numeric!');
+				}
+				$data['languageId'] = intval($languageId);
+			}
+			$this->call('editobject', $data);
+			return $this->getObject($objectId);
+		}
+		
+		/**
+		 * Gets all {@link Category}(ies) from QBank.
+		 * @author Björn Hjortsten
+		 * @return array An array of {@link Category}.
+		 */
+		public function getCategories() {
+			$results = $this->call('getcategories', array());
+			$categories = array();
+			if (is_array($results->categories)) {
+				foreach ($results->categories as $result) {
+					$categories[] = new Category($result->id, $result->name);
+				}
+			}
+			return $categories;
 		}
 		
 		/**
 		 * Gets a property type from QBank.
 		 * @param string $systemName The name of the property type.
+		 * @throws PropertyException Thrown if the property type does not exist.
 		 * @throws CommunicationException Thrown if something went wrong while getting the property type.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
@@ -114,6 +243,9 @@
 		 */
 		public function getPropertyType($systemName) {
 			$result = $this->getPropertyTypes(array($systemName));
+			if (empty($result[$systemName])) {
+				throw new PropertyException('The specified property does not exist!');
+			}
 			return $result[$systemName];
 		}
 		
@@ -130,13 +262,16 @@
 			if (is_array($param)) {
 				$data['propertyTypeNames'] = $param;
 			} elseif (is_numeric($param)) {
-				//TODO fetch all from category
-				$data[''] = $param;
+				$data['categoryId'] = intval($param);
 			} else {
-				//TODO fetch all
+				// Don't send anything to get everything!
 			}
 			$result = $this->call('getPropertyTypes', $data);
-			foreach ($result->propertyTypes as $propertyType) {
+			foreach ($result->propertyTypes as $propertyName => $propertyType) {
+				if (empty($propertyType)) {
+					trigger_error('Skipping property type "'.$propertyName.'". Probably does not exist.', 'warning');
+					continue;
+				}
 				$propertyTypes[$propertyType->propertyName] = PropertyType::createFromRawObject($propertyType);
 			}
 			return $propertyTypes;
@@ -160,8 +295,10 @@
 					} else {
 						$aspect = implode(':', $aspect);
 					}
-					$templates[$template->templatename] = new ImageTemplate(strval($template->templatename), intval($template->width), intval($template->height), strval($template->filetype),
+					$tmp = new ImageTemplate(strval($template->templatename), intval($template->width), intval($template->height), strval($template->filetype),
 																			$aspect, intval($template->quality), intval($template->resolution));
+					$tmp->setId(intval($template->templateId));
+					$templates[$template->templatename] = $tmp;
 				}
 			}
 			return $templates;
@@ -182,6 +319,43 @@
 				return $templates[$name];
 			} else {
 				throw new InvalidArgumentException(sprintf('No template with the name %s was found', $name));
+			}
+		}
+		
+		/**
+		 * Gets deployment information about an object.
+		 * @param int $objectId The id of the object to get deployment information about.
+		 * @author Björn Hjortsten
+		 * @return array An array of {@link DeploymentSite}s.
+		 */
+		public function getDeploymentInformation($objectId) {
+			$results = $this->call('getdeploymentinformation', array('objectId' => $objectId));
+			$siteInfo = array();
+			if (is_array($results->sites) && !empty($results->sites)) {
+				foreach ($results->sites as $result) {
+					$siteInfo[] = DeploymentSite::createFromRawObject($result);
+				}
+			}
+			return $siteInfo;
+		}
+		
+		/**
+		 * Encodes an array of {@link PropertyBase}s for transmission to the API.
+		 * @param array $properties The array to be encoded.
+		 * @author Björn Hjortsten
+		 * @return array An array ready for transport.
+		 */
+		private function prepareProperties(array $properties) {
+			if (is_array($properties)) {
+				$props = array();
+				foreach ($properties as $property) {
+					if (is_a($property, 'PropertyBase')) {
+						$props[$property->getSystemName()] = $property->getValue();
+					} else {
+						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->qbankAddress.'/'.$function, 'Skipping bad value '.@strval($property)), 3, QBankAPI::CALLS_LOG);
+					}
+				}
+				return $props;
 			}
 		}
 	}

@@ -53,7 +53,7 @@
 		 * @return Property
 		 */
 		public static function createFromRawObject(stdClass $rawProperty) {
-			if (!is_null($rawProperty->propertyType)) {
+			if (@!is_null($rawProperty->propertyType)) {
 				$propertyValueType = Property::getPropertyValueTypeFromString($rawProperty->propertyType);
 			} else {
 				$propertyValueType = null;
@@ -103,6 +103,7 @@
 			}
 			$property = new Property(intval($rawProperty->propertyId), intval($rawProperty->id), $rawProperty->propertyName, $rawProperty->title, 
 									   $value, $defaultValue, $propertyValueType, (bool) $rawProperty->multiplechoice, (bool) $rawProperty->editable);
+			@$property->qbankValueType = $rawProperty->propertyType;
 			if (isset($rawProperty->editable)) {
 				$property->editable = (bool) $rawProperty->editable;
 			} else {
@@ -175,6 +176,7 @@
 			}
 			$property = new Property(intval($rawProperty->id), intval($rawProperty->propertyTypeId), $rawProperty->propertyName, $rawProperty->title,
 									 $value, null, $propertyValueType, false, false);
+			$property->qbankValueType = null;
 			$property->editable = null;
 			$property->mandatory = null;
 			$property->keywords = null;
