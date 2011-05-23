@@ -69,17 +69,16 @@
     		}
     		set_time_limit(0);
     		
-    		if (strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
+    		/*if (strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
         		$filename = preg_replace('/\./', '%2e', $name, substr_count($filename, '.') - 1);
-    		}
+    		}*/
     		
-    		header('Cache-Control: ');
-		    header('Pragma: ');
-		    header('Content-Type: '.$mimetype);
-		    header('Content-Length: ' .(string)(filesize($pathToFile)) );
 		    header('Content-Disposition: attachment; filename="'.$filename.'"');
-		    header('Content-Transfer-Encoding: binary'."\n");
+		    error_log("$realPath");
+			header('X-SendFile: '.$realPath);
+			die;
 		    
+			/*
 		    if ($fileHandle = fopen($pathToFile, 'rb')) {
 		        while ((!feof($fileHandle)) && (connection_status() == 0)) {
 		            print(fread($fileHandle, 1024*8));
@@ -87,6 +86,7 @@
 		        }
 		        fclose($fileHandle);
 		    }
+		    */
 		    
 		    return ((connection_status() == 0) and !connection_aborted());
 		}
