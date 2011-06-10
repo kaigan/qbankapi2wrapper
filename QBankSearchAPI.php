@@ -122,6 +122,9 @@
 			if (!is_null($search->getFreeText()) && $search->getFreeText()) {
 				$data['freetext'] = $search->getFreeText();
 			}
+			if (!is_null($search->getTitle()) && $search->getTitle()) {
+				$data['title'] = $search->getTitle();
+			}
 			if (!is_null($search->getFolderId()) && $search->getFolderId() > 0) {
 				$data['folderId'] = $search->getFolderId();
 				$data['recursive'] = $search->getFolderRecurse();
