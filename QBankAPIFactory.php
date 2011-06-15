@@ -33,7 +33,7 @@
 			if (!class_exists($type)) {
 				throw new QBankAPIException('The type of API supplied was not found! Please check your parameters.');
 			}
-			$api = new $type($_SESSION['qbankapi']['address']);
+			$api = new $type($_SESSION['qbankapi']['address'], $_SESSION['qbankapi']['apiaddress']);
 			if (isset($_SESSION['qbankapi']['hash'])) {
 				$api->setHash($_SESSION['qbankapi']['hash']);
 			} else {
@@ -55,7 +55,7 @@
 		 * @author Björn Hjortsten
 		 * @return void
 		 */
-		public static function setUp($qbankAddress, $username, $password, $languageId = null) {
+		public static function setUp($qbankAddress, $username, $password, $languageId = null, $apiAddress = null) {
 			@session_start();
 			$_SESSION['qbankapi']['address'] 	= $qbankAddress;
 			$_SESSION['qbankapi']['username'] 	= $username;
@@ -64,6 +64,11 @@
 				$_SESSION['qbankapi']['languageid'] = intval($languageId);
 			} else {
 				$_SESSION['qbankapi']['languageid'] = null;
+			}
+			if (!is_null($apiAddress)) {
+				$_SESSION['qbankapi']['apiaddress'] = $apiAddress;
+			} else {
+				$_SESSION['qbankapi']['apiaddress'] = null;
 			}
 		}
 	}
