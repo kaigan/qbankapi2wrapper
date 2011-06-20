@@ -190,15 +190,15 @@
 				$result = json_decode($resultJSON);
 				if (!isset($result->success) || $result->success === false) {
 					if (isset($result->error)) {
-						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
+						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
 						throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
 					} else {
-						error_log(sprintf('[%s] (%s) %s: %s'."\n\t".'Response: %s'."\n", date('Y-m-d H:i:s'), 'UNKNOWN ERROR', $this->qbankAddress.'/'.$function, $json, $resultJSON), 3, QBankAPI::UNKNOWNS_LOG);
+						error_log(sprintf('[%s] (%s) %s: %s'."\n\t".'Response: %s'."\n", date('Y-m-d H:i:s'), 'UNKNOWN ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json, $resultJSON), 3, QBankAPI::UNKNOWNS_LOG);
 						throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error. Please note the time and report this to support@kaigantbk.se', 99, 'UnknownError');
 					}
 				}
 				if ($log === true) {
-					error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
+					error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
 				}
 				return $result;
 			}
