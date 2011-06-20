@@ -30,12 +30,18 @@
 		/**
 		 * Sets up the class and prepares for calls to the QBank API.
 		 * @param string $qbankAddress The address to the qbank being called.
+		 * @param string @apiAddress The address to the api being called.
 		 * @throws QBankAPIException Thrown if unable to access or create logfiles.
 		 * @author Björn Hjortsten
 		 * @return QBankAPI
 		 */
-		public function __construct($qbankAddress) {
+		public function __construct($qbankAddress, $apiAddress = null) {
 			$this->qbankAddress = $qbankAddress;
+			if (empty($apiAddress)) {
+				$this->apiAddress = 'http://api2.qbank.se';
+			} else {
+				$this->apiAddress = $apiAddress;
+			}
 			$this->curlHandle = curl_init();
 			$this->requestTimeout = 10;
 			$this->useSSL(false);						// Do not use SSL as default
@@ -136,11 +142,13 @@
 		 * @return void
 		 */
 		public function useSSL($bool) {
+			$apiAddress = parse_url($this->apiAddress);
 			if ($bool === true) {
-				$this->apiAddress = 'https://api2.qbank.se';
+				$apiAddress['scheme'] = 'https';
 			} else {
-				$this->apiAddress = 'http://api2.qbank.se';
+				$apiAddress['scheme'] = 'http';
 			}
+			@$this->apiAddress = $apiAddress['scheme'].'://'.$apiAddress['host'].$apiAddress['path'];
 			$this->useSSL = $bool;
 		}
 		
@@ -182,15 +190,15 @@
 				$result = json_decode($resultJSON);
 				if (!isset($result->success) || $result->success === false) {
 					if (isset($result->error)) {
-						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
+						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
 						throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
 					} else {
-						error_log(sprintf('[%s] (%s) %s: %s'."\n\t".'Response: %s'."\n", date('Y-m-d H:i:s'), 'UNKNOWN ERROR', $this->qbankAddress.'/'.$function, $json, $resultJSON), 3, QBankAPI::UNKNOWNS_LOG);
+						error_log(sprintf('[%s] (%s) %s: %s'."\n\t".'Response: %s'."\n", date('Y-m-d H:i:s'), 'UNKNOWN ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json, $resultJSON), 3, QBankAPI::UNKNOWNS_LOG);
 						throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error. Please note the time and report this to support@kaigantbk.se', 99, 'UnknownError');
 					}
 				}
 				if ($log === true) {
-					error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
+					error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
 				}
 				return $result;
 			}
