@@ -21,7 +21,7 @@
 			$result = $this->call('getmoodboards', array());
 			if (is_array($result->moodboards) && !empty($result->moodboards)) {
 				foreach ($result->moodboards as $moodboard) {
-					$moodboards[$moodboard->moodboardName] = Moodboard::createFromRawObject($moodboard);
+					$moodboards[$moodboard->hash] = Moodboard::createFromRawObject($moodboard);
 				}
 			}
 			return $moodboards;
