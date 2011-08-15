@@ -74,6 +74,7 @@
     		}*/
     		
 		    header('Content-Disposition: attachment; filename="'.$filename.'"');
+		    header('Content-Type: '.$mimetype);
 		    error_log("$realPath");
 			header('X-SendFile: '.$realPath);
 			die;
