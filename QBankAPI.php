@@ -64,7 +64,6 @@
 				$calls = @fopen(QBankAPI::CALLS_LOG, 'ab');
 				if ($calls === false) {
 					@fclose($calls);
-					echo 'path'.QBankAPI::CALLS_LOG;
 					throw new QBankAPIException('Could not create the log file!');
 				}
 				@fclose($calls);
