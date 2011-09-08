@@ -57,6 +57,13 @@
 		 */
 		public static function setUp($qbankAddress, $username, $password, $languageId = null, $apiAddress = null) {
 			@session_start();
+			if (isset($_SESSION['qbankapi']['hash'])) {
+				if ($_SESSION['qbankapi']['address'] != $qbankAddress || $_SESSION['qbankapi']['username'] != $username ||
+					$_SESSION['qbankapi']['password'] != $password || $_SESSION['qbankapi']['languageid'] != $languageId ||
+					$_SESSION['qbankapi']['apiaddress'] != $apiAddress) {
+					unset($_SESSION['qbankapi']['hash']);
+				}
+			}
 			$_SESSION['qbankapi']['address'] 	= $qbankAddress;
 			$_SESSION['qbankapi']['username'] 	= $username;
 			$_SESSION['qbankapi']['password'] 	= $password;
