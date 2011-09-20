@@ -1,5 +1,6 @@
 <?php
 	require_once 'model/SimpleObject.php';	
+	require_once 'exceptions/ObjectException.php';
 
 	/**
 	 * Represents an object in QBank.
