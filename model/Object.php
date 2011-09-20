@@ -279,12 +279,16 @@
 			foreach ($rawObject->properties as $rawProperty) {
 				$properties[] = Property::createFromRawObject($rawProperty);
 			}
-			$object->setProperties($properties);
+			if (@is_array($properties)) {
+				$object->setProperties($properties);
+			}
 			
 			foreach ($rawObject->children as $child) {
 				$children[] = SimpleObject::createFromRawObject($child);
 			}
-			$object->setChildren($children);
+			if (@is_array($children)) {
+				$object->setChildren($children);
+			}
 			
 			return $object;
 		}
