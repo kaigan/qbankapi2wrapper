@@ -77,6 +77,12 @@
 		protected $bitsPerSecond;
 		
 		/**
+		 * The objects children
+		 * @var array
+		 */
+		protected $children; 
+		
+		/**
 		 * Creates a new object.
 		 * @param int $id The id of the object.
 		 * @param int $mediaId The id of the objects media.
@@ -106,9 +112,8 @@
 			parent::__construct($id, $mediaId, $name, $created, $updated, $categoryId, $categoryName, $ownerId, $filename, $mimetype, $fileExtension, $filenameOfHashedThumbnail, $filesize);
 			
 			$properties = array();
+			$children = array();
 		}
-		
-		
 		
 		/**
 		 * Gets the current version of the object.
@@ -203,6 +208,44 @@
 		}
 		
 		/**
+		 * Sets {@link SimpleObject}s as children of the {@link Object}.
+		 * @param array $children An array of {@link SimpleObject}s.
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
+		protected function setChildren(array $children) {
+			foreach ($children as $child) {
+				if ($child instanceof SimpleObject) {
+					$this->children[$child->getId()] = $child;
+				}
+			}
+		}
+		
+		/**
+		 * Gets all of this {@link Object}s children.
+		 * @author Björn Hjortsten
+		 * @return array An array of {@link SimpleObject}s.
+		 */
+		public function getChildren() {
+			return $this->children;
+		}
+		
+		/**
+		 * Gets a specific child from the {@link Object}.
+		 * @param int $id The id of the child to get.
+		 * @throws ObjectException Thrown if the object does not have any child with the supplied id.
+		 * @author Björn Hjortsten
+		 * @return SimpleObject
+		 */
+		public function getChild($id) {
+			if (isset($this->children[$id])) {
+				return $this->children[$id];
+			} else {
+				throw new ObjectException('The object does not have any child with the id '.$id.'.');
+			}
+		}
+		
+		/**
 		 * Creates an {@link Object} from an object directly from the API.
 		 * WARNING: If this is called with the wrong raw object, you may get warnings or even errors!
 		 * @param stdClass $rawObject The raw object from the API-call.
@@ -210,6 +253,7 @@
 		 * @return Object
 		 */
 		public static function createFromRawObject(stdClass $rawObject) {
+			var_dump($rawObject);
 			$object = new Object(intval($rawObject->information->id), intval($rawObject->information->mediaId), $rawObject->information->name, strtotime($rawObject->information->createdTime),
 								 strtotime($rawObject->information->updatedTime), strtotime($rawObject->information->uploadTime), intval($rawObject->information->objectType),
 								 $rawObject->information->objectTypeName, $rawObject->information->version, intval($rawObject->information->owner), $rawObject->information->filename,
@@ -236,6 +280,11 @@
 				$properties[] = Property::createFromRawObject($rawProperty);
 			}
 			$object->setProperties($properties);
+			
+			foreach ($rawObject->children as $child) {
+				$children[] = SimpleObject::createFromRawObject($child);
+			}
+			$object->setChildren($children);
 			
 			return $object;
 		}

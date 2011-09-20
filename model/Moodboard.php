@@ -60,7 +60,25 @@
 		 * The email address to which notices about the moodboard should be sent.
 		 * @var string
 		 */
-		protected $email; 
+		protected $email;
+		
+		/**
+		 * The default size of thumbnails.
+		 * @var string
+		 */
+		protected $defaultThumbSize;
+		
+		/**
+		 * The pincode
+		 * @var string
+		 */
+		protected $pincode;
+		
+		/**
+		 * Whether search is enabled or not.
+		 * @var bool
+		 */
+		protected $searchEnabled;
 		
 		/**
 		 * Creates a new Moodboard.
@@ -158,6 +176,33 @@
 		}
 		
 		/**
+		 * Gets the default thumbnail size.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
+		public function getDefaultThumbSize() {
+			return $this->defaultThumbSize;
+		}
+		
+		/**
+		 * Gets the pincode.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
+		public function getPinCode() {
+			return $this->pincode;
+		}
+		
+		/**
+		 * Tells whether search is enabled or not.
+		 * @author Björn Hjortsten
+		 * @return bool
+		 */
+		public function isSearchEnabled() {
+			return $this->searchEnabled;
+		}
+		
+		/**
 		 * Creates a Mooboard from an object directly from a call to the API.
 		 * WARNING: If this is called with the wrong raw object, you may get warnings or even errors!
 		 * @param stdClass $rawObject
@@ -165,6 +210,7 @@
 		 * @return Moodboard
 		 */
 		public static function createFromRawObject($rawObject) {
+			var_dump($rawObject);
 			$moodboard = new Moodboard($rawObject->moodboardId, $rawObject->moodboardName, $rawObject->expireDate);
 			$moodboard->hash = strval($rawObject->hash);
 			$moodboard->creationTime = strtotime($rawObject->createdDate);
@@ -172,6 +218,9 @@
 			$moodboard->footerText = strval(trim($rawObject->footerText));
 			$moodboard->notes = strval(trim($rawObject->notes));
 			$moodboard->email = strval(trim($rawObject->email));
+			$moodboard->defaultThumbSize = strval(trim($rawObject->listtype));
+			$moodboard->pincode = $rawObject->pincode;
+			$moodboard->searchEnabled = (bool)$rawObject->search;
 			return $moodboard;
 		}
 	}
