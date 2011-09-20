@@ -210,7 +210,6 @@
 		 * @return Moodboard
 		 */
 		public static function createFromRawObject($rawObject) {
-			var_dump($rawObject);
 			$moodboard = new Moodboard($rawObject->moodboardId, $rawObject->moodboardName, $rawObject->expireDate);
 			$moodboard->hash = strval($rawObject->hash);
 			$moodboard->creationTime = strtotime($rawObject->createdDate);

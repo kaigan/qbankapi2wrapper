@@ -254,7 +254,6 @@
 		 * @return Object
 		 */
 		public static function createFromRawObject(stdClass $rawObject) {
-			var_dump($rawObject);
 			$object = new Object(intval($rawObject->information->id), intval($rawObject->information->mediaId), $rawObject->information->name, strtotime($rawObject->information->createdTime),
 								 strtotime($rawObject->information->updatedTime), strtotime($rawObject->information->uploadTime), intval($rawObject->information->objectType),
 								 $rawObject->information->objectTypeName, $rawObject->information->version, intval($rawObject->information->owner), $rawObject->information->filename,
