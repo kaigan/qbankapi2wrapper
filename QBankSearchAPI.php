@@ -165,6 +165,9 @@
 					'forfetching'	=> false
 				);
 			}
+			if ($search->getIncludeChildren() == true) {
+				$data['includeChildren'] = true;
+			}
 			return $this->processResult($this->call('searchfrontend', $data, true), $search->getAdvancedObjects());
 		}
 		

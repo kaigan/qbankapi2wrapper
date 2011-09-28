@@ -101,6 +101,12 @@
 		protected $advancedObjects;
 		
 		/**
+		 * If children should be included as seperate objects in the search result.
+		 * @var bool
+		 */
+		protected $includeChildren; 
+		
+		/**
 		 * Creates a new Search and sets defaults.
 		 * @author Björn Hjortsten
 		 * @return void
@@ -114,6 +120,7 @@
 			$this->deployed = true;
 			$this->advancedObjects = false;
 			$this->setSortOrder(SearchOrder::ID_DESCENDING);
+			$this->includeChildren = false;
 		}
 		
 		/**
@@ -472,6 +479,25 @@
 		 */
 		public function getAdvancedObjects() {
 			return $this->advancedObjects;
+		}
+		
+		/**
+		 * Sets whether to include child {@link SimpleObject}s as seperate entitys in the result.
+		 * @param bool $bool
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
+		public function setIncludeChildren($bool) {
+			$this->includeChildren = (bool)$bool;
+		}
+		
+		/**
+		 * Gets whether to include child {@link SimpleObject}s as seperate entitys in the result.
+		 * @author Björn Hjortsten
+		 * @return bool
+		 */
+		public function getIncludeChildren() {
+			return $this->includeChildren;
 		}
 	}
 ?>
