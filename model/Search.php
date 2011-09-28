@@ -494,7 +494,7 @@
 		/**
 		 * Gets whether to include child {@link SimpleObject}s as seperate entitys in the result.
 		 * @author Björn Hjortsten
-		 * @return bool 
+		 * @return bool
 		 */
 		public function getIncludeChildren() {
 			return $this->includeChildren;
