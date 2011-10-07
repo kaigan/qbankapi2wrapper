@@ -129,7 +129,7 @@
 		 * @author Björn Hjortsten
 		 * @return Object The newly created object in QBank.
 		 */
-		public function upload($categoryId, $name, $pathToFile, array $properties = null) {
+		public function upload($categoryId, $name, $pathToFile, array $properties = array()) {
 			$function = 'createobject';
 			if (!is_numeric($categoryId)) {
 				throw new InvalidArgumentException('Category id is not a number!');
