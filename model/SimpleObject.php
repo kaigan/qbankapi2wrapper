@@ -399,6 +399,11 @@
 			$this->addProperties($properties);
 		}
 		
+		/**
+		 * Gets the site template ids the object is publish to.
+		 * @author Björn Hjortsten
+		 * @return array An array of integers.
+		 */
 		public function getPublishedTo() {
 			return $this->publishedTo;
 		}

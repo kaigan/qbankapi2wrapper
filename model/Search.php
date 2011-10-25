@@ -443,6 +443,12 @@
 			$this->deployed = (bool)$bool;
 		}
 		
+		/**
+		 * Sets the site template ids to search for. This will trigger deployed only searching.
+		 * @param array $siteTemplateIds An array of site template ids.
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
 		public function setIsPublishedTo(array $siteTemplateIds) {
 			$this->isPublishedTo = array();
 			foreach ($siteTemplateIds as $siteTemplateId) {
@@ -453,6 +459,11 @@
 			$this->deployed = true;
 		}
 		
+		/**
+		 * Gets the site template ids to search in.
+		 * @author Björn Hjortsten
+		 * @return array An array of integers.
+		 */
 		public function getIsPublishedTo() {
 			return $this->isPublishedTo;
 		}
