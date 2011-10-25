@@ -164,6 +164,11 @@
 					'operator'		=> PropertyCriteria::EQUAL,
 					'forfetching'	=> false
 				);
+				
+				$publishedTo = $search->getIsPublishedTo();
+				if (!empty($publishedTo)) {
+					$data['publishedTo'] = $publishedTo;
+				}
 			}
 			if ($search->getIncludeChildren() == true) {
 				$data['includeChildren'] = true;

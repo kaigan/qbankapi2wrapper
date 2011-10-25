@@ -123,6 +123,12 @@
 		protected $properties;
 		
 		/**
+		 * The site template ids the object is published to.
+		 * @var array
+		 */
+		protected $publishedTo; 
+		
+		/**
 		 * Creates a new SimpleObject.
 		 * @param int $id The id of the object.
 		 * @param int $mediaId The id of the objects media.
@@ -154,7 +160,8 @@
 			$this->filenameOfHashedThumbnail = $filenameOfHashedThumbnail;
 			$this->filesize = $filesize;
 			
-			$properties = array();
+			$this->properties = array();
+			$this->publishedTo = array();
 		}
 		
 		/**
@@ -392,6 +399,10 @@
 			$this->addProperties($properties);
 		}
 		
+		public function getPublishedTo() {
+			return $this->publishedTo;
+		}
+		
 		/**
 		 * Creates a {@link SimpleObject} from an object directly from the API.
 		 * WARNING: If this is called with the wrong raw object, you may get warnings or even errors!
@@ -410,6 +421,14 @@
 			@list($width, $height) = explode('x', $rawObject->thumbWidthHeight);
 			$object->thumbnailWidth = intval($width);
 			$object->thumbnailHeigth = intval($height);
+			
+			if (isset($rawObject->publishedTo) && is_array($rawObject->publishedTo)) {
+				foreach ($rawObject->publishedTo as $publishedTo) {
+					if (is_numeric($publishedTo)) {
+						$object->publishedTo[] = (int)$publishedTo;
+					}
+				}
+			}
 			
 			if (isset($rawObject->properties) && (is_array($rawObject->properties) || is_object($rawObject->properties))) {
 				$properties = array();

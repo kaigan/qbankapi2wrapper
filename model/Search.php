@@ -107,6 +107,12 @@
 		protected $includeChildren; 
 		
 		/**
+		 * Include only results published to these site-template ids
+		 * @var unknown_type
+		 */
+		protected $isPublishedTo; 
+		
+		/**
 		 * Creates a new Search and sets defaults.
 		 * @author Björn Hjortsten
 		 * @return void
@@ -256,7 +262,7 @@
 			$this->folderId = array();
 			foreach ($folderIds as $folderId) {
 				if (is_numeric($folderId)) {
-					$this->folderId = (int)$folderId;
+					$this->folderId[] = (int)$folderId;
 				}
 			}
 			$this->folderRecurse = $recursive;
@@ -435,6 +441,20 @@
 		 */
 		public function setOnlyDeployed($bool) {
 			$this->deployed = (bool)$bool;
+		}
+		
+		public function setIsPublishedTo(array $siteTemplateIds) {
+			$this->isPublishedTo = array();
+			foreach ($siteTemplateIds as $siteTemplateId) {
+				if (is_numeric($siteTemplateId)) {
+					$this->isPublishedTo[] = (int)$siteTemplateId;
+				}
+			}
+			$this->deployed = true;
+		}
+		
+		public function getIsPublishedTo() {
+			return $this->isPublishedTo;
 		}
 		
 		/**
