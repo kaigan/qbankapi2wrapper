@@ -246,9 +246,26 @@
 		}
 		
 		/**
+		 * Sets the ids of the {@link Folder}s to search in.
+		 * @param array $folderIds An array of folder ids to search in.
+		 * @param bool $recursive Whether the folder searches should be recursive.
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
+		public function setFolderIds(array $folderIds, $recursive = false) {
+			$this->folderId = array();
+			foreach ($folderIds as $folderId) {
+				if (is_numeric($folderId)) {
+					$this->folderId = (int)$folderId;
+				}
+			}
+			$this->folderRecurse = $recursive;
+		} 
+		
+		/**
 		 * Gets the id of the {@link Folder} to search in.
 		 * @author Björn Hjortsten
-		 * @return int
+		 * @return mixed integer or array of integers.
 		 */
 		public function getFolderId() {
 			return $this->folderId;
