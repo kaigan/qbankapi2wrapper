@@ -192,7 +192,7 @@
 					foreach ($objects as $key => $object) {
 						$calls[] = array('name' => $key, 'function' => 'getobjectinformation', 'arguments' => array('objectId' => $object->getId()));
 					}
-					$result2 = $this->call('batch', array('calls' => $calls));
+					$result2 = $this->call('batch', array('calls' => $calls), true);
 					$objects = array();
 					foreach ($result2->results as $res) {
 						$objects[] = Object::createFromRawObject($res->data);

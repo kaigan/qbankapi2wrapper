@@ -12,5 +12,7 @@
 		const NAME_ASCENDING = 'name ASC';
 		const LAST_MODIFIED_DESCENDING = 'modified DESC';
 		const LAST_MODIFIED_ASCENDING = 'modified ASC';
+		const FOLDER_ORDER_DESCENDING = 'folderorder DESC';
+		const FOLDER_ORDER_ASCENDING = 'folderorder ASC';
 	}
 ?>
