@@ -240,5 +240,17 @@
 		public function valid() {
 			return array_key_exists($this->position, $this->results);
 		}
+		
+		/**
+		 * Sorts the result by the supplied comparing function.
+		 * This will only sort this page, not the total result.
+		 * @param callback $cmp_function The function to call when sorting.
+		 * @see usort()
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
+		public function sort($cmp_function) {
+			usort($this->results, $cmp_function);
+		}
 	}
 ?>

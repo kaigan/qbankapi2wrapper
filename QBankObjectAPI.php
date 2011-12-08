@@ -103,12 +103,15 @@
 		 * @author Björn Hjortsten
 		 * @return void
 		 */
-		public function getMedia($mediaId, $type = 'original', $redirect = true) {
+		public function getMedia($mediaId, $type = 'original', $redirect = true, $moodboardHash = null) {
 			if (is_numeric($type)) {
 				$type = intval($type);
 				$url = sprintf('%s/%s/getMedia?hash=%s&id=%d&templateId=%d', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId, $type);
 			} else {
 				$url = sprintf('%s/%s/getMedia?hash=%s&id=%d&type=%s', $this->apiAddress, $this->qbankAddress, $this->hash, $mediaId, $type);
+			}
+			if ($moodboardHash != null) {
+				$url .= '&mhash='.$moodboardHash;
 			}
 			if ($redirect == true) {
 				header('Location: '.$url);
