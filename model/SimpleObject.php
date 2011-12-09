@@ -427,10 +427,15 @@
 			$object->thumbnailWidth = intval($width);
 			$object->thumbnailHeigth = intval($height);
 			
-			if (isset($rawObject->publishedTo) && is_array($rawObject->publishedTo)) {
-				foreach ($rawObject->publishedTo as $publishedTo) {
-					if (is_numeric($publishedTo)) {
-						$object->publishedTo[] = (int)$publishedTo;
+			if (isset($rawObject->publishedTo)) {
+				if ($rawObject->publishedTo instanceof stdClass) {
+					$rawObject->publishedTo = (array)$rawObject->publishedTo;
+				}
+				if (is_array($rawObject->publishedTo)) {
+					foreach ($rawObject->publishedTo as $publishedTo) {
+						if (is_numeric($publishedTo)) {
+							$object->publishedTo[] = (int)$publishedTo;
+						}
 					}
 				}
 			}
