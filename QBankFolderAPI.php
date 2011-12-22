@@ -156,13 +156,14 @@
 		 * Edits a folder in QBank.
 		 * @param int $folderId The id of the folder to be edited.
 		 * @param string $name The new name of the folder.
+		 * @param array $properties A key=>value array where the key is the system name.
 		 * @throws CommunicationException Thrown if something went went wrong while editing the folder.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
 		 * @return SimpleFolder The changed folder.
 		 */
-		public function editFolder($folderId, $name) {
-			$calls[] = array('name' => 'edit', 'function' => 'editfolder', 'arguments' => array('folderId' => $folderId, 'name' => $name));
+		public function editFolder($folderId, $name, array $properties = array()) {
+			$calls[] = array('name' => 'edit', 'function' => 'editfolder', 'arguments' => array('folderId' => $folderId, 'name' => $name, 'properties' => $properties));
 			$calls[] = array('name' => 'folder', 'function' => 'getfolderinformation', 'arguments' => array('folderId' => $folderId));
 			$result = $this->call('batch', array('calls' => $calls));
 			if ($result->results->edit->success !== true) {

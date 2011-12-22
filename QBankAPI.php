@@ -187,6 +187,7 @@
 				$this->lastCall = $error;
 				curl_close($this->curlHandle);
 				$this->curlHandle = curl_init();
+				error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
 				throw new ConnectionException($error, curl_errno($this->curlHandle));
 			} else {
 				$this->lastCall = $resultJSON;
