@@ -197,7 +197,7 @@
 				try {
 					Folder::addToTree($tree, $folder, $shortestTree);
 				} catch (FolderException $fe) {
-					throw new FolderException(sprintf('Failed to generate tree: %s'), $fe->getMessage());
+					trigger_error($fe->getMessage(), E_USER_WARNING);
 				}
 			}
 			return $tree;
@@ -242,8 +242,13 @@
 					}
 					$currentFolder->addChild($folder);
 				} catch (FolderException $fe) {
-					throw new FolderException(sprintf('Error while adding folder to tree. Current folder id: %d, child folder id: %d. Previous exception: %s',
-											  $currentFolder->getId(), $folder->getId(), $fe->getMessage()));
+					if ($currentFolder instanceof Folder) {
+						$parentId = $currentFolder->getId();
+					} else {
+						$parentId = 'null';
+					}
+					throw new FolderException(sprintf('Error while adding folder to tree. Current folder id: %s, child folder id: %d. Previous exception: %s',
+											  $parentId, $folder->getId(), $fe->getMessage()));
 				}
 			}
 		}
