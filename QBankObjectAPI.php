@@ -345,6 +345,20 @@
 		}
 		
 		/**
+		 * Creates a group of objects.
+		 * @param int $parentId The id of the {@link SimpleObject} that should be the parent of the group.
+		 * @param array $childIds An array of ids to {@link SimpleObject}s that should belong to the group.
+		 * @author Björn Hjortsten
+		 * @throws CommunicationException Thrown if something went wrong while creating the group.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @return boolean Returns true if the group of objects has been created.
+		 */
+		public function createRelation($parentId, array $childIds) {
+			$result = $this->call('createrelation', array('motherId' => $parentId, 'childIds' => $childIds));
+			return true;
+		}
+		
+		/**
 		 * Encodes an array of {@link PropertyBase}s for transmission to the API.
 		 * @param array $properties The array to be encoded.
 		 * @author Björn Hjortsten
