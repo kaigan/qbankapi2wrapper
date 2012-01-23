@@ -345,6 +345,48 @@
 		}
 		
 		/**
+		 * Deploys objects to a remote (outside QBank) location.
+		 * @param int $siteId The id of the remote location.
+		 * @param array $objectIds The ids of the objects to deploy.
+		 * @param bool $asynchronous Whether to deploy asynchronously. The method will return immediately if true.
+		 * @param stdObject $result Will contain the result if called synchronously.
+		 * @author Björn Hjortsten
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @throws CommunicationException Thrown if something went wrong while deploying.
+		 * @return void
+		 */
+		public function deploy($siteId, array $objectIds, $asynchronous = false, &$result) {
+			if ($asynchronous == true) {
+				foreach ($objectIds as $objectId) {
+					$this->callAsync('deploy', array('siteId' => $siteId, 'objectIds' => $objectIds));
+				}
+			} else {
+				$result = $this->call('deploy', array('siteId' => $siteId, 'objectIds' => $objectIds));
+			}
+		}
+		
+		/**
+		 * Undeploys objects from a remote (outside QBank) location.
+		 * @param int $siteId The id of the remote location.
+		 * @param array $objectIds The ids of the objects to undeploy.
+		 * @param bool $asynchronous Whether to undeploy asynchronously. The method will return immediately if true.
+		 * @param stdObject $result Will contain the result if called synchronously.
+		 * @author Björn Hjortsten
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @throws CommunicationException Thrown if something went wrong while deploying.
+		 * @return void
+		 */
+		public function undeploy($siteId, array $objectIds, $asynchronous = false, &$result) {
+			if ($asynchronous == true) {
+				foreach ($objectIds as $objectId) {
+					$this->callAsync('undeploy', array('siteId' => $siteId, 'objectIds' => $objectIds));
+				}
+			} else {
+				$result = $this->call('undeploy', array('siteId' => $siteId, 'objectIds' => $objectIds));
+			}
+		}
+		
+		/**
 		 * Creates a group of objects.
 		 * @param int $parentId The id of the {@link SimpleObject} that should be the parent of the group.
 		 * @param array $childIds An array of ids to {@link SimpleObject}s that should belong to the group.

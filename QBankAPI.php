@@ -208,6 +208,35 @@
 			}
 		}
 		
+		protected function callAsync($function, array $data, $log = false) {
+			if (strtolower($function) == 'login') {
+				throw new QBankAPIException('Login can not be called asynchronously!');
+			}
+			if (!empty($this->hash)) {
+				$data['hash'] = $this->hash;
+			}
+			
+			$socket = fsockopen(parse_url($this->apiAddress, PHP_URL_HOST), 80, $errno, $errstr, $this->requestTimeout);
+			if ($socket === false) {
+				throw new ConnectionException('Error while opening asynchronous socket: '.$errstr, $errno);
+			}
+			
+			$data = 'data='.urlencode(json_encode($data));
+			
+			$msg = 'POST /'.$this->qbankAddress.'/'.$function.' HTTP/1.1'."\r\n";
+			$msg .= 'Host:'.parse_url($this->apiAddress, PHP_URL_HOST)."\r\n";
+			$msg .= 'Content-type: application/x-www-form-urlencoded'."\r\n";
+			$msg .= 'Content-length: '.strlen($data)."\r\n";
+			$msg .= 'Connection: Close'."\r\n\r\n";
+			$msg .= $data;
+			
+			$result = fwrite($socket, $msg);
+			if ($result === false) {
+				throw new ConnectionException('Error while writing to asycnhronous socket!');
+			}
+			@fclose($socket);
+		}
+		
 		/**
 		 * Returns the last result in its raw form. Normally this will be a JSON-string, but may be any string.
 		 * Will return NULL if no calls have been made.
