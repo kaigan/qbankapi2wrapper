@@ -355,7 +355,7 @@
 		 * @throws CommunicationException Thrown if something went wrong while deploying.
 		 * @return void
 		 */
-		public function deploy($siteId, array $objectIds, $asynchronous = false, &$result) {
+		public function deploy($siteId, array $objectIds, $asynchronous = false, &$result = null) {
 			if ($asynchronous == true) {
 				foreach ($objectIds as $objectId) {
 					$this->callAsync('deploy', array('siteId' => $siteId, 'objectIds' => $objectIds));
@@ -376,7 +376,7 @@
 		 * @throws CommunicationException Thrown if something went wrong while deploying.
 		 * @return void
 		 */
-		public function undeploy($siteId, array $objectIds, $asynchronous = false, &$result) {
+		public function undeploy($siteId, array $objectIds, $asynchronous = false, &$result = null) {
 			if ($asynchronous == true) {
 				foreach ($objectIds as $objectId) {
 					$this->callAsync('undeploy', array('siteId' => $siteId, 'objectIds' => $objectIds));

@@ -216,7 +216,7 @@
 				$data['hash'] = $this->hash;
 			}
 			
-			$socket = fsockopen(parse_url($this->apiAddress, PHP_URL_HOST), 80, $errno, $errstr, $this->requestTimeout);
+			$socket = fsockopen(parse_url($this->apiAddress, PHP_URL_HOST), 80, $errno, $errstr);
 			if ($socket === false) {
 				throw new ConnectionException('Error while opening asynchronous socket: '.$errstr, $errno);
 			}
