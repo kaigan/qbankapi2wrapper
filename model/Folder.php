@@ -180,6 +180,20 @@
 		}
 		
 		/**
+		* Sorts the subfolders by the supplied comparing function.
+		* @param callback $cmp_function The function to call when sorting.
+		* @see usort()
+		* @author Björn Hjortsten
+		* @return void
+		*/
+		public function sort($cmp_function) {
+			usort($this->children, $cmp_function);
+			foreach ($this->children as $child) {
+				$child->sort($cmp_function);
+			}
+		}
+		
+		/**
 		 * Creates a tree of a flat array of {@link Folder}s or {@link SimpleFolder}s.
 		 * @param array $folders An array of {@link Folder}s or {@link SimpleFolder}s. May be mixed.
 		 * @throws FolderException Thrown if an error occurs while building the folder tree.
