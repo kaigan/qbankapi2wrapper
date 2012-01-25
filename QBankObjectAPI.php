@@ -222,6 +222,28 @@
 		}
 		
 		/**
+		 * Saves a new value as the Objects name.
+		 * @param int $objectId The id of the object.
+		 * @param string $name The new name of the object.
+		 * @author Björn Hjortsten
+		 * @throws InvalidArgumentException Thrown if the objectId is not numeric.
+		 * @throws CommunicationException Thrown if something went wrong while saving the name.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @return Object The object with the new name set.
+		 */
+		public function saveName($objectId, $name) {
+			if (!is_numeric($objectId)) {
+				throw new InvalidArgumentException('Object id is not a number!');
+			}
+			$data = array();
+			$data['objectId'] = intval($objectId);
+			$data['information'] = array('name' => $name);
+			
+			$this->call('editobject', $data);
+			return $this->getObject($objectId);
+		}
+		
+		/**
 		 * Gets all {@link Category}(ies) from QBank.
 		 * @author Björn Hjortsten
 		 * @return array An array of {@link Category}.
