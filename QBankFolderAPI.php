@@ -4,6 +4,7 @@
 	require_once 'model/SimpleFolder.php';
 	require_once 'model/Folder.php';
 	require_once 'model/Property.php';
+	require_once 'model/SimpleObject.php';
 	
 	/**
 	 * Provides functionality for folders in QBank.
@@ -111,6 +112,27 @@
 				$folder = $folders;
 			}
 			return $folder;
+		}
+		
+		/**
+		 * Gets all the folders an object exists in.
+		 * @param SimpleObject $object The object to get the folders for.
+		 * @author Björn Hjortsten
+		 * @throws CommunicationException Thrown if something went went wrong getting the folders.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @return array An array of {@link SimpleFolder}s.
+		 */
+		public function getFoldersByObject(SimpleObject $object) {
+			$result = $this->call('getfoldersbyobjectid', array('objectId' => $object->getId()));
+			if (is_array($result->folders)) {
+				$folders = array();
+				foreach ($result->folders as $rawFolder) {
+					$folders[] = new SimpleFolder($rawFolder->name, $rawFolder->tree, $rawFolder->owner, strtotime($rawFolder->created), strtotime($rawFolder->updated));
+				}
+				return $folders;
+			} else {
+				return array();
+			}
 		}
 		
 		/**
