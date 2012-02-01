@@ -173,6 +173,13 @@
 			if ($search->getIncludeChildren() == true) {
 				$data['includeChildren'] = true;
 			}
+			if (is_array($search->getExcludedFolders()) && $search->getExcludedFolders()) {
+				$data['excludedFolderIds'] = $search->getExcludedFolders();
+			}
+			if (is_array($search->getExcludedObjects()) && $search->getExcludedObjects()) {
+				$data['excludedObjectIds'] = $search->getExcludedObjects();
+			}
+			
 			return $this->processResult($this->call('searchfrontend', $data, true), $search->getAdvancedObjects());
 		}
 		

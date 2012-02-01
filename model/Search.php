@@ -113,6 +113,18 @@
 		protected $isPublishedTo; 
 		
 		/**
+		 * An array of the folder ids to exclude from the search results.
+		 * @var array
+		 */
+		protected $excludedFolders;
+		
+		/**
+		 * An array of the object ids to exclude from the search results.
+		 * @var array
+		 */
+		protected $excludedObjects;
+		
+		/**
 		 * Creates a new Search and sets defaults.
 		 * @author Björn Hjortsten
 		 * @return void
@@ -546,6 +558,42 @@
 		 */
 		public function getIncludeChildren() {
 			return $this->includeChildren;
+		}
+		
+		/**
+		 * Sets the folders which content to exclude from the search.
+		 * @author Björn Hjortsten
+		 * @param array $folderIds An array of {@link Folder} ids.
+		 */
+		public function setExcludedFolders(array $folderIds) {
+			$this->excludedFolders = $folderIds;
+		}
+		
+		/**
+		 * Gets the folders which content to exclude from the search.
+		 * @author Björn Hjortsten
+		 * @return array An array of {@link Folder} ids.
+		 */
+		public function getExcludedFolders() {
+			return $this->excludedFolders;
+		}
+		
+		/**
+		* Sets the objects which to exclude from the search.
+		* @author Björn Hjortsten
+		* @param array $objectIds An array of {@link Object} ids.
+		*/
+		public function setExcludedObjects(array $objectIds) {
+			$this->excludedObjects = $objectIds;
+		}
+		
+		/**
+		 * Gets the objects which to exclude from the search.
+		 * @author Björn Hjortsten
+		 * @return array An array of {@link Object} ids.
+		 */
+		public function getExcludedObjects() {
+			return $this->excludedObjects;
 		}
 	}
 ?>
