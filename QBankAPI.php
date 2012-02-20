@@ -27,6 +27,7 @@
 		protected $hash;
 		protected $useSSL;
 		protected $lastCall;
+		protected $lastCallInfo;
 		
 		/**
 		 * Sets up the class and prepares for calls to the QBank API.
@@ -46,6 +47,7 @@
 			$this->curlHandle = curl_init();
 			$this->requestTimeout = 10;
 			$this->lastCall = null;
+			$this->lastCallInfo = array();
 			$this->useSSL(false);						// Do not use SSL as default
 			
 			// Check for logfiles
@@ -182,6 +184,7 @@
 			}
 			curl_setopt($this->curlHandle, CURLOPT_USERAGENT, 'QBankAPIWrapper '.QBankAPI::VERSION);
 			$resultJSON = curl_exec($this->curlHandle);
+			$this->lastCallInfo = curl_getinfo($this->curlHandle);
 			if ($resultJSON === false) {
 				$error = sprintf('Error while comunicating with QBank: %s', curl_error($this->curlHandle));
 				$this->lastCall = $error;
@@ -245,6 +248,17 @@
 		 */
 		public function getRawResult() {
 			return $this->lastCall;
+		}
+		
+		/**
+		 * Returns information from cURL about the last call.
+		 * Will return NULL if no calls have been made.
+		 * @author Björn Hjortsten
+		 * @see curl_getinfo()
+		 * @return array An associative array containing lots of info.
+		 */
+		public function getCallInfo() {
+			return $this->lastCallInfo;
 		}
 		
 		/**
