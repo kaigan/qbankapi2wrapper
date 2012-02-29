@@ -186,6 +186,7 @@
 		 */
 		public function editFolder($folderId, $name, array $properties = array()) {
 			$calls[] = array('name' => 'edit', 'function' => 'editfolder', 'arguments' => array('folderId' => $folderId, 'name' => $name, 'properties' => $properties));
+>>>>>>> refs/heads/master
 			$calls[] = array('name' => 'folder', 'function' => 'getfolderinformation', 'arguments' => array('folderId' => $folderId));
 			$result = $this->call('batch', array('calls' => $calls));
 			if ($result->results->edit->success !== true) {
