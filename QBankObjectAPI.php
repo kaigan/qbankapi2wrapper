@@ -144,50 +144,34 @@
 			if (!is_readable($path)) {
 				throw new InvalidArgumentException('The supplied path "'.$pathToFile.'" is not readable!');
 			}
-			$data['hash'] = $this->hash;
-			$data['categoryId'] = intval($categoryId);
-			$data['name'] = strval($name);
+			$data = array();
+			$data['categoryId'] = (int)$categoryId;
+			$data['name'] = (string)$name;
 			$properties = $this->prepareProperties($properties);
 			if (!empty($properties)) {
 				$data['properties'] = $properties;
 			}
-			$json = json_encode($data);
-			$data = array(
-				'data' => $json,
-				'userfile' => '@'.$path
-			);
-			$url = sprintf('%s/%s/%s', $this->apiAddress, $this->qbankAddress, $function);
-			curl_setopt($this->curlHandle, CURLOPT_URL, $url);
-			curl_setopt($this->curlHandle, CURLOPT_POST, true);
-			curl_setopt($this->curlHandle, CURLOPT_POSTFIELDS, $data);
-			curl_setopt($this->curlHandle, CURLOPT_FOLLOWLOCATION, true);
-			curl_setopt($this->curlHandle, CURLOPT_FAILONERROR, true);
-			curl_setopt($this->curlHandle, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($this->curlHandle, CURLOPT_TIMEOUT, $this->requestTimeout);
-			if ($this->useSSL === true) {
-				curl_setopt($this->curlHandle, CURLOPT_SSL_VERIFYPEER, false);
-			}
-			curl_setopt($this->curlHandle, CURLOPT_USERAGENT, 'QBankAPIWrapper '.QBankAPI::VERSION);
-			error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'UPLOAD', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
-			$resultJSON = curl_exec($this->curlHandle);
-			if ($resultJSON === false) {
-				$error = sprintf('Error while comunicating with QBank: %s', curl_error($this->curlHandle));
-				curl_close($this->curlHandle);
-				$this->curlHandle = curl_init();
-				throw new ConnectionException($error, curl_errno($this->curlHandle));
-			}
-			$result = json_decode($resultJSON);
-			if (!isset($result->success) || $result->success === false) {
-				if (isset($result->error)) {
-					error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
-					throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
-				} else {
-					error_log(sprintf('[%s] (%s) %s: %s'."\n\t".'Response: %s'."\n", date('Y-m-d H:i:s'), 'UNKNOWN ERROR', $this->qbankAddress.'/'.$function, $json, $resultJSON), 3, QBankAPI::UNKNOWNS_LOG);
-					throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error. Please note the time and report this to support@kaigantbk.se', 99, 'UnknownError');
-				}
-			}
+			$result = $this->call('createobject', $data, true, $path);
+			
 			$object = $this->getObject($result->objectId);
 			return $object;
+		}
+		
+		/**
+		 * Uploads a file as a new version of an already uploaded object.
+		 * @param int $objectId The id of the object to replace.
+		 * @param string $pathToFile A path to the file to upload.
+		 * @throws InvalidArgumentException Thrown if $objectId is not numeric.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @throws CommunicationException Thrown if something went wrong while communicating with QBank.
+		 * @author Björn Hjortsten
+		 * @return void
+		 */
+		public function newVersion($objectId, $pathToFile) {
+			if (!is_numeric($objectId)) {
+				throw new InvalidArgumentException('Object id is not a number!');
+			}
+			$this->call('createnewversion', array('objectId' => $objectId), true, $pathToFile);
 		}
 		
 		/**

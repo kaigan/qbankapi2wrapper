@@ -15,7 +15,7 @@
 		 * The version of QBankAPIWrapper.
 		 * @var string
 		 */
-		const VERSION = '1.2.1209';
+		const VERSION = '1.2.1213';
 		
 		const CALLS_LOG = '/var/log/qbankapiwrapper/calls.log';
 		const UNKNOWNS_LOG = '/var/log/qbankapiwrapper/unknowns.log';
@@ -160,17 +160,36 @@
 		 * @internal Uses Curl to communicate.
 		 * @param string $function The name of the API-function to call.
 		 * @param array $data The data to be sent to the called API-function. Usually normal PHP-arrays or objects.
+		 * @param bool $log Whether to log the call. Mainly used for debugging.
+		 * @param string $pathToFile A path to a file to send. Used when uploading.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @throws CommunicationException Thrown if the call returned an exception.
+		 * @throws QBankAPIException Thrown when $pathToFile is on the wrong format.
 		 * @author Björn Hjortsten
 		 * @return mixed The result of a successfull call in the form of an object or array where applicable. If buffering is enabled, it will return the ticket name.
 		 */
-		protected function call($function, $data, $log = false) {
+		protected function call($function, $data, $log = false, $pathToFile = null) {
 			if (!empty($this->hash) && strtolower($function) != 'login') {
 				$data['hash'] = $this->hash;
 			}
 			$json = json_encode($data);
-			$data = 'data='.urlencode($json);
+			if ($pathToFile != null) {
+				$path = realpath($pathToFile);
+				if (!is_file($path)) {
+					throw new QBankAPIException('The supplied path "'.$pathToFile.'" is not a path to a file!');
+				}
+				if (!is_readable($path)) {
+					throw new QBankAPIException('The supplied path "'.$pathToFile.'" is not readable!');
+				}
+				$data = array(
+					'data' => $json,
+					'file' => '@'.$path
+				);
+			} else {
+				$data = array(
+					'data' => $json
+				);
+			}
 			$url = sprintf('%s/%s/%s', $this->apiAddress, $this->qbankAddress, $function);
 			curl_setopt($this->curlHandle, CURLOPT_URL, $url);
 			curl_setopt($this->curlHandle, CURLOPT_POST, true);
@@ -197,7 +216,7 @@
 				$result = json_decode($resultJSON);
 				if (!isset($result->success) || $result->success === false) {
 					if (isset($result->error)) {
-						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json), 3, QBankAPI::CALLS_LOG);
+						error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, 'Request'.$json.' Response'.$resultJSON), 3, QBankAPI::CALLS_LOG);
 						throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
 					} else {
 						error_log(sprintf('[%s] (%s) %s: %s'."\n\t".'Response: %s'."\n", date('Y-m-d H:i:s'), 'UNKNOWN ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json, $resultJSON), 3, QBankAPI::UNKNOWNS_LOG);
@@ -239,6 +258,8 @@
 			}
 			@fclose($socket);
 		}
+		
+		
 		
 		/**
 		 * Returns the last result in its raw form. Normally this will be a JSON-string, but may be any string.
