@@ -139,13 +139,14 @@
 		 * Creates a folder in QBank.
 		 * @param string $name The name of the new folder.
 		 * @param int $parentFolderId The id of the new folders parent folder.
+		 * @param int $folderType The type of folder to create.
 		 * @throws CommunicationException Thrown if something went went wrong while creating the folder.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @author Björn Hjortsten
 		 * @return SimpleFolder The new folder.
 		 */
-		public function createFolder($name, $parentFolderId = 0) {
-			$calls[] = array('name' => 'creation', 'function' => 'createfolder', 'arguments' => array('name' => $name, 'parentId' => $parentFolderId));
+		public function createFolder($name, $parentFolderId = 0, $folderType = 1) {
+			$calls[] = array('name' => 'creation', 'function' => 'createfolder', 'arguments' => array('name' => $name, 'parentId' => $parentFolderId, 'folderType' => $folderType));
 			$calls[] = array('name' => 'folder', 'function' => 'getfolderinformation', 'arguments' => array('folderId' => '$creation.folderId'));
 			$result = $this->call('batch', array('calls' => $calls));
 			if ($result->results->creation->success !== true) {
