@@ -28,6 +28,20 @@
 		}
 		
 		/**
+		 * Gets a specific Moodboard from QBank specified by a hash.
+		 * @param string $hash The hash that specifies which Moodboard to get.
+		 * @throws CommunicationException Thrown if something went wrong while getting the Moodboard or there are no 
+		 * Moodboards with the specified hash.
+		 * @throws ConnectionException Thrown if something went wrong with the connection.
+		 * @author Björn Hjortsten
+		 * @return Moodboard The {@link Moodboard} with the specified hash.
+		 */
+		public function getMoodboard($hash) {
+			$result = $this->call('getmoodboard', array('moodboardHash' => $hash));
+			return Moodboard::createFromRawObject($result->moodboard);
+		}
+		
+		/**
 		 * Gets all the templates for Moodboards from QBank.
 		 * @throws CommunicationException Thrown if something went wrong while getting the image template.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
