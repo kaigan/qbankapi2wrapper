@@ -3,6 +3,7 @@
 	require_once 'QBankMoodboardAPI.php';
 	require_once 'QBankObjectAPI.php';
 	require_once 'QBankSearchAPI.php';
+	require_once 'QBankAccountAPI.php';
 	
 	/**
 	 * A factory for creating API-objects.
@@ -17,6 +18,7 @@
 		const MoodboardAPI	= 'QBankMoodboardAPI';
 		const ObjectAPI		= 'QBankObjectAPI';
 		const SearchAPI		= 'QBankSearchAPI';
+		const AccountAPI	= 'QBankAccountAPI';
 		
 		/**
 		 * Creates a new fully initiated API-object of the supplied type.
