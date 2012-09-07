@@ -1,8 +1,5 @@
 <?php
-require_once 'QBankAPI.php';
-
-require_once 'model/Group.php';
-
+require_once 'qbankapiwrapperautoloader.php';
 /**
  * Provides functionality for accounts (users, groups, etc.) in QBank.
  * @author Björn Hjortsten

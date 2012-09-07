@@ -1,8 +1,4 @@
 <?php
-	require_once 'model/IHasProperties.php';
-	require_once 'model/SimpleFolder.php';
-	require_once 'exceptions/FolderException.php';
-	
 	/**
 	 * Represents a QBank folder.
 	 * @author Björn Hjortsten

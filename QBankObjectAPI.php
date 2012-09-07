@@ -1,10 +1,5 @@
 <?php
-	require_once 'QBankAPI.php';
-	
-	require_once 'model/Object.php';
-	require_once 'model/ImageTemplate.php';
-	require_once 'model/DeploymentSite.php';
-	require_once 'model/Category.php';
+	require_once 'qbankapiwrapperautoloader.php';
 	
 	/**
 	 * Provides functionality for objects in QBank.

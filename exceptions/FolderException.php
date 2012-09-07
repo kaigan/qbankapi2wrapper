@@ -1,6 +1,4 @@
 <?php
-	require_once 'QBankAPIException.php';
-	
 	/**
 	 * Represents an error while handling folders in QBank.
 	 * @author Björn Hjortsten

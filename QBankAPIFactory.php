@@ -1,9 +1,5 @@
 <?php
-	require_once 'QBankFolderAPI.php';
-	require_once 'QBankMoodboardAPI.php';
-	require_once 'QBankObjectAPI.php';
-	require_once 'QBankSearchAPI.php';
-	require_once 'QBankAccountAPI.php';
+	require_once 'qbankapiwrapperautoloader.php';
 	
 	/**
 	 * A factory for creating API-objects.

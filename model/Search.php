@@ -1,6 +1,4 @@
 <?php
-	require_once 'model/SearchOrder.php';
-
 	/**
 	 * Represents a search in QBank.
 	 * Not to be confused with {@link SearchResult} which represents the result of a Search. This is the Query.

@@ -1,8 +1,4 @@
 <?php
-	require_once 'exceptions/QBankAPIException.php';
-	require_once 'exceptions/ConnectionException.php';
-	require_once 'exceptions/CommunicationException.php';
-	
 	/**
 	 * Base class for the QBank API. Provides basic functionality.
 	 * @author Björn Hjortsten

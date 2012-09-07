@@ -1,6 +1,4 @@
 <?php
-	require_once 'model/PropertyCriteria.php';
-	
 	/**
 	 * Represents a request for properties when searching.
 	 * @author Björn Hjortsten

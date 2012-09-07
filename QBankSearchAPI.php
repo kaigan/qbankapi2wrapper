@@ -1,13 +1,5 @@
 <?php
-	require_once 'QBankAPI.php';
-	
-	require_once 'model/SearchOrder.php';
-	require_once 'model/SearchResult.php';
-	require_once 'model/Search.php';
-	require_once 'model/PropertyCriteria.php';
-	require_once 'model/PropertyRequest.php';
-	require_once 'model/SimpleObject.php';
-	require_once 'model/Object.php';
+	require_once 'qbankapiwrapperautoloader.php';
 	
 	/**
 	 * Provides functionality for searching in QBank.

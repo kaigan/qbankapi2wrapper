@@ -1,6 +1,5 @@
 <?php
-	require_once 'QBankAPI.php';
-	require_once 'model/Moodboard.php';
+	require_once 'qbankapiwrapperautoloader.php';
 	
 	/**
 	 * Provides functionality for Moodboards in QBank.

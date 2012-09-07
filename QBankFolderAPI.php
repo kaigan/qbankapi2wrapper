@@ -1,10 +1,5 @@
 <?php
-	require_once 'QBankAPI.php';
-	
-	require_once 'model/SimpleFolder.php';
-	require_once 'model/Folder.php';
-	require_once 'model/Property.php';
-	require_once 'model/SimpleObject.php';
+	require_once 'qbankapiwrapperautoloader.php';
 	
 	/**
 	 * Provides functionality for folders in QBank.

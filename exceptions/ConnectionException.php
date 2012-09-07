@@ -1,6 +1,4 @@
 <?php
-	require_once 'QBankAPIException.php';
-	
 	/**
 	 * Represents an error in the connection to QBank.
 	 * Probably not related to QBank but to the network.

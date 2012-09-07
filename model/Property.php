@@ -1,7 +1,4 @@
 <?php
-	require_once 'model/PropertyValueType.php';
-	require_once 'model/PropertyType.php';
-	
 	/**
 	 * Represents a QBank property.
 	 * @author Björn Hjortsten
