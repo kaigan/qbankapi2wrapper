@@ -5,8 +5,8 @@ function qbankwrapperautoload($class) {
 	foreach ($subPaths as $subPath) {
 		$file = $path.$subPath.$class.'.php';
 		if (file_exists($file)) {
-			require_once $file;
-			break;
+			include_once $file;
+			return true;
 		}
 	}
 }

@@ -1,5 +1,5 @@
 <?php
-	require_once 'qbankapiwrapperautoloader.php';
+	require_once dirname(__FILE__).'/qbankapiwrapperautoloader.php';
 	
 	/**
 	 * A factory for creating API-objects.
