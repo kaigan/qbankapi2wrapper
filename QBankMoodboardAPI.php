@@ -69,6 +69,7 @@
 		 * @param string $headerText Some text to display before the content of the moodboard.
 		 * @param string $footerText Some text to display after the content of the moodboard.
 		 * @param string $notes Private notes about the moodboard.
+		 * @param bool $makePrivate Decide if this moodboard should be private or not 
 		 * @throws InvalidArgumentException Thrown if $expirationDate is not a valid date.
 		 * @throws CommunicationException Thrown if something went wrong while getting the image template.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
@@ -77,7 +78,7 @@
 		 */
 		public function createMoodboard($name, $expirationDate, $templateId, $language, $pincode = null,
 										array $objectIds = array(), $headerText = null, $footerText = null,
-										$notes = null) {
+										$notes = null, $makePrivate = false) {
 			$data['name'] = strval($name);
 			if (!preg_match('/\d{4}-\d{2}-\d{2}/', $expirationDate) && is_numeric($expirationDate)) {
 				$data['expirationDate'] = strftime('%F', intval($expirationDate));
@@ -89,6 +90,7 @@
 			}
 			$data['templateId'] = intval($templateId);
 			$data['language'] = strval($language);
+			$data['makePrivate'] = $makePrivate;
 			if (!empty($pincode)) {
 				$data['pincode'] = strval($pincode);
 			}
