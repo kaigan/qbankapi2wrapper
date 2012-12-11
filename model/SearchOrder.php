@@ -14,5 +14,7 @@
 		const LAST_MODIFIED_ASCENDING = 'modified ASC';
 		const FOLDER_ORDER_DESCENDING = 'folderorder DESC';
 		const FOLDER_ORDER_ASCENDING = 'folderorder ASC';
+		const FILENAME_ASCENDING = 'filename ASC';
+		const FILENAME_DESCENDING = 'filename DESC';
 	}
 ?>
