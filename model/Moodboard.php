@@ -81,6 +81,18 @@
 		protected $searchEnabled;
 		
 		/**
+		 * The moodboards template name.
+		 * @var string
+		 */
+		protected $templateName;
+		
+		/**
+		 * The moodboards template id
+		 * @var int
+		 */
+		protected $templateId;
+		
+		/**
 		 * Creates a new Moodboard.
 		 * @param int $id The Moodboards id.
 		 * @param string $name The Moodboards name.
@@ -203,6 +215,24 @@
 		}
 		
 		/**
+		 * Gets the template name.
+		 * @author Björn Hjortsten
+		 * @return string
+		 */
+		public function getTemplateName() {
+			return $this->templateName;
+		}
+		
+		/**
+		 * Gets the template id.
+		 * @author Björn Hjortsten
+		 * @return int
+		 */
+		public function getTemplateId() {
+			return $this->templateId;
+		}
+		
+		/**
 		 * Creates a Mooboard from an object directly from a call to the API.
 		 * WARNING: If this is called with the wrong raw object, you may get warnings or even errors!
 		 * @param stdClass $rawObject
@@ -220,6 +250,8 @@
 			$moodboard->defaultThumbSize = strval(trim($rawObject->listtype));
 			$moodboard->pincode = $rawObject->pincode;
 			$moodboard->searchEnabled = (bool)$rawObject->search;
+			$moodboard->templateName = $rawObject->templateName;
+			$moodboard->templateId = (int)$rawObject->template;
 			return $moodboard;
 		}
 	}
