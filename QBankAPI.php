@@ -151,6 +151,15 @@
 			$this->useSSL = $bool;
 		}
 		
+		public function isValidConnection(){
+			try {
+				$result = $this->call('emptyfunction', array('objectId' => 0));
+				return true;
+			} catch (CommunicationException $ce) {
+				return false;
+			}
+		}
+		
 		/**
 		 * Executes a call to the QBank API.
 		 * @internal Uses Curl to communicate.
@@ -254,8 +263,6 @@
 			}
 			@fclose($socket);
 		}
-		
-		
 		
 		/**
 		 * Returns the last result in its raw form. Normally this will be a JSON-string, but may be any string.

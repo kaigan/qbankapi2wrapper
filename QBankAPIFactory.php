@@ -34,15 +34,23 @@
 			$api = new $type($_SESSION['qbankapi']['address'], $_SESSION['qbankapi']['apiaddress']);
 			if (isset($_SESSION['qbankapi']['hash'])) {
 				$api->setHash($_SESSION['qbankapi']['hash']);
-			} else {
-				$loggedIn = $api->login($_SESSION['qbankapi']['username'], $_SESSION['qbankapi']['password'], $_SESSION['qbankapi']['languageid']);
-				if (!$loggedIn) {
-					throw new QBankAPIException('Error while logging in to QBank! Either wrong username or password.');
+				if (!$api->isValidConnection()) {
+					$api = self::login($api);
 				}
-				$_SESSION['qbankapi']['hash'] = $api->getHash();
+			} else {
+				$api = self::login($api);
 			}
 			return $api;
 		}
+		
+		protected static function login($api) {
+			$loggedIn = $api->login($_SESSION['qbankapi']['username'], $_SESSION['qbankapi']['password'], $_SESSION['qbankapi']['languageid']);
+			if (!$loggedIn) {
+				throw new QBankAPIException('Error while logging in to QBank! Either wrong username or password.');
+			}
+			$_SESSION['qbankapi']['hash'] = $api->getHash();
+			return $api;
+		} 
 		
 		/**
 		 * Sets up the factory.
