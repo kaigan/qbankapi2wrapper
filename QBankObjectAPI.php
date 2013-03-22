@@ -120,7 +120,7 @@
 		 * @param int $categoryId The category that the object should belong to.
 		 * @param string $name The name of the new object.
 		 * @param string $pathToFile The path to the file to upload.
-		 * @param array $properties An array of {@link PropertyBase}s. Defines proåerty values of the new object.
+		 * @param array $properties An array of {@link PropertyBase}s. Defines property values of the new object.
 		 * @throws InvalidArgumentException Thrown if $categoryId is not a number or if $pathToFile is invalid.
 		 * @throws ConnectionException Thrown if something went wrong with the connection.
 		 * @throws CommunicationException Thrown if something went wrong while communicating with QBank.

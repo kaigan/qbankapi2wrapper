@@ -9,7 +9,7 @@ When you have obtained the source files you need to make them accessible for you
 QBankAPI2Wrapper will try to log to the directory `/var/log/qbankapiwrapper`, so make sure that the folder exists and is writable by the php process.
 
 ## Class library
-A class library is available at [http://tools.kaigantbk.se/docs/docs/QBankAPIWrapper/](http://tools.kaigantbk.se/docs/docs/QBankAPIWrapper/) or in PDF form upon request.
+A class library is available at [http://tools.kaigantbk.se/docs/docs/QBankAPI2Wrapper/](http://tools.kaigantbk.se/docs/docs/QBankAPI2Wrapper/) or in PDF form upon request.
 
 ## Usage
 
