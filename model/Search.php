@@ -28,9 +28,9 @@
 		
 		/**
 		 * The category id to search in.
-		 * @var int
+		 * @var array
 		 */
-		protected $categoryId;
+		protected $categoryIds;
 		
 		/**
 		 * The moodboard id to search in.
@@ -137,6 +137,7 @@
 			$this->advancedObjects = false;
 			$this->setSortOrder(SearchOrder::ID_DESCENDING);
 			$this->includeChildren = false;
+			$this->categoryIds = array();
 		}
 		
 		/**
@@ -201,25 +202,32 @@
 		
 		/**
 		 * Sets the id of the category to search in.
-		 * @param int $id
+		 * @param int|array $id Either a single id or an array of ids.
 		 * @throws InvalidArgumentException Thrown if $id is not numeric.
 		 * @author Björn Hjortsten
 		 * @return void
 		 */
 		public function setCategoryId($id) {
-			if (!is_numeric($id)) {
-				throw new InvalidArgumentException('The Category id must be a number');
+			if (is_numeric($id)) {
+				$this->categoryIds = array($id);
+			} else if (is_array($id)) {
+				foreach ($id as &$candidate) {
+					$candidate = (int)$candidate;
+				}
+				unset($candidate);
+				$this->categoryIds = array_filter($id);
+			} else {
+				throw new InvalidArgumentException('Invalid argument. Category ids must be an integer or array.');
 			}
-			$this->categoryId = intval($id);
 		}
 		
 		/**
-		 * Gets the id of the category to search in.
+		 * Gets the ids of the categories to search in.
 		 * @author Björn Hjortsten
-		 * @return int
+		 * @return array
 		 */
 		public function getCategoryId() {
-			return $this->categoryId;
+			return $this->categoryIds;
 		}
 		
 		/**

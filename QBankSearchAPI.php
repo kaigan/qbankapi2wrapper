@@ -109,7 +109,7 @@
 				$data['operator'] = 'OR';
 			}
 			if (!is_null($search->getCategoryId()) && $search->getCategoryId() > 0) {
-				$data['categoryId'] = $search->getCategoryId();
+				$data['categoryIds'] = $search->getCategoryId();
 			}
 			if (!is_null($search->getFreeText()) && $search->getFreeText()) {
 				$data['freetext'] = $search->getFreeText();
