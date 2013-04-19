@@ -208,6 +208,9 @@
 		 * @return void
 		 */
 		public function setCategoryId($id) {
+			if (empty($id)) {
+				return;
+			}
 			if (is_numeric($id)) {
 				$this->categoryIds = array($id);
 			} else if (is_array($id)) {
