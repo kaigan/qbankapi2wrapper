@@ -139,8 +139,8 @@
 			}
 			if (is_array($search->getPropertyCriterias()) && $search->getPropertyCriterias()) {
 				foreach ($search->getPropertyCriterias() as $criteria) {
-					if (!($criteria->getSystemName() == 'system_media_status' && $criteria->isForFetching() == false)
-							&& $search->getOnlyDeployed()) {
+					if (!($criteria->getSystemName() == 'system_media_status' && $criteria->isForFetching() == false
+							&& $search->getOnlyDeployed())) {
 						$data['properties'][] = array(
 							'name' 			=> $criteria->getSystemName(),
 							'value'			=> $criteria->getValue(),
