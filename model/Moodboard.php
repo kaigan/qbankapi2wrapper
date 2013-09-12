@@ -93,6 +93,12 @@
 		protected $templateId;
 		
 		/**
+		 * Whether the moodboard is deployable.
+		 * @var bool
+		 */
+		protected $deployable;
+		
+		/**
 		 * Creates a new Moodboard.
 		 * @param int $id The Moodboards id.
 		 * @param string $name The Moodboards name.
@@ -232,6 +238,10 @@
 			return $this->templateId;
 		}
 		
+		public function isDeployable() {
+			return $this->deployable;
+		}
+		
 		/**
 		 * Creates a Mooboard from an object directly from a call to the API.
 		 * WARNING: If this is called with the wrong raw object, you may get warnings or even errors!
@@ -252,6 +262,7 @@
 			$moodboard->searchEnabled = (bool)$rawObject->search;
 			$moodboard->templateName = $rawObject->templateName;
 			$moodboard->templateId = (int)$rawObject->template;
+			$moodboard->deployable = (bool)$rawObject->deployable;
 			return $moodboard;
 		}
 	}
