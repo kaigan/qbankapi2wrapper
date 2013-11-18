@@ -2,9 +2,12 @@
 
 namespace Kaigan\QBank2\API;
 
+use \Kaigan\QBank2\API\Exception\APIException;
 use \Kaigan\QBank2\API\Exception\CommunicationException;
 use \Kaigan\QBank2\API\Exception\ConnectionException;
-use \Kaigan\QBank2\API\Exception\APIException;
+use \Monolog\Handler\AbstractHandler;
+use \Monolog\Handler\ErrorLogHandler;
+use \Monolog\Logger;
 	
 /**
  * Base class for the QBank API. Provides basic functionality.
@@ -19,9 +22,6 @@ abstract class BaseAPI {
 	 */
 	const VERSION = '1.3.0';
 
-	const CALLS_LOG = '/var/log/qbankapiwrapper/calls.log';
-	const UNKNOWNS_LOG = '/var/log/qbankapiwrapper/unknowns.log';
-
 	protected $apiAddress;
 	protected $qbankAddress;
 	protected $curlHandle;
@@ -30,6 +30,16 @@ abstract class BaseAPI {
 	protected $useSSL;
 	protected $lastCall;
 	protected $lastCallInfo;
+	
+	/**
+	 * @var Logger
+	 */
+	protected $callLog;
+	
+	/**
+	 * @var Logger
+	 */
+	protected $wrapperLog;
 
 	/**
 	 * Sets up the class and prepares for calls to the QBank API.
@@ -52,38 +62,10 @@ abstract class BaseAPI {
 		$this->lastCallInfo = array();
 		$this->useSSL(false);						// Do not use SSL as default
 
-		// Check for logfiles
-		// Does the log directories exist?
-		if (!is_dir(dirname(BaseAPI::CALLS_LOG))) {
-			if (@mkdir(dirname(BaseAPI::CALLS_LOG), 0774) === false) {
-				throw new APIException('Could not create the calls log file folder!');
-			}
-		}
-		if (!is_dir(dirname(BaseAPI::UNKNOWNS_LOG))) {
-			if (@mkdir(dirname(BaseAPI::UNKNOWNS_LOG), 0774) === false) {
-				throw new APIException('Could not create the unknown calls log file folder!');
-			}
-		}
-
-		// Does the calls log file exist?
-		if (!is_writable(BaseAPI::CALLS_LOG)) {
-			$calls = @fopen(BaseAPI::CALLS_LOG, 'ab');
-			if ($calls === false) {
-				@fclose($calls);
-				throw new APIException('Could not create the log file!');
-			}
-			@fclose($calls);
-		}
-
-		// Does the unknowns log file exist?
-		if (!is_writable(BaseAPI::UNKNOWNS_LOG)) {
-			$calls = @fopen(BaseAPI::UNKNOWNS_LOG, 'ab');
-			if ($calls === false) {
-				@fclose($calls);
-				throw new APIException('Could not create the log file!');
-			}
-			@fclose($calls);
-		}
+		$this->callLog = new Logger('api-calls');
+		$this->callLog->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logger::NOTICE));
+		$this->wrapperLog = new Logger('wrapper');
+		$this->wrapperLog->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logger::NOTICE));
 	}
 
 	/**
@@ -104,6 +86,11 @@ abstract class BaseAPI {
 	 */
 	public function setHash($hash) {
 		$this->hash = $hash;
+	}
+	
+	public function addLogHandler(Monolog\Handler\AbstractHandler $handler) {
+		$this->callLog->pushHandler($handler);
+		$this->wrapperLog->pushHandler($handler);
 	}
 
 	/**
@@ -133,8 +120,10 @@ abstract class BaseAPI {
 		try {
 			$result = $this->call('login', $data);
 		} catch (CommunicationException $ce) {
+			$this->wrapperLog->warning('Faulty login.', array('username' => $username));
 			return false;
 		}
+		$this->wrapperLog->info('Login.', array('hash' => $result->hash));
 		$this->setHash($result->hash);
 		return true;
 	}
@@ -187,9 +176,11 @@ abstract class BaseAPI {
 		if ($pathToFile != null) {
 			$path = realpath($pathToFile);
 			if (!is_file($path)) {
+				$this->wrapperLog->critical('Error while uploading. The supplied path is not a path to a file!', array('path' => $path));
 				throw new APIException('The supplied path "'.$pathToFile.'" is not a path to a file!');
 			}
 			if (!is_readable($path)) {
+				$this->wrapperLog->critical('Error while uploading. The supplied path is not readable!', array('path' => $path));
 				throw new APIException('The supplied path "'.$pathToFile.'" is not readable!');
 			}
 			$data = array(
@@ -220,22 +211,42 @@ abstract class BaseAPI {
 			$this->lastCall = $error;
 			curl_close($this->curlHandle);
 			$this->curlHandle = curl_init();
-			error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json), 3, BaseAPI::CALLS_LOG);
+			$this->callLog->critical($error, array('address' => $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, 'request' => $json));
 			throw new ConnectionException($error, curl_errno($this->curlHandle));
 		} else {
 			$this->lastCall = $resultJSON;
 			$result = json_decode($resultJSON);
 			if (!isset($result->success) || $result->success === false) {
 				if (isset($result->error)) {
-					error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, 'Request'.$json.' Response'.$resultJSON), 3, BaseAPI::CALLS_LOG);
+					$this->callLog->critical('Error response from the API. '.$result->error->message, array(
+						'code' => $result->error->code,
+						'type' => $result->error->type,
+						'address' => $this->apiAddress.'/'.$this->qbankAddress.'/'.$function,
+						'request' => $json,
+						'response' => $resultJSON
+					));
 					throw new CommunicationException($result->error->message, $result->error->code, $result->error->type);
 				} else {
-					error_log(sprintf('[%s] (%s) %s: %s'."\n\t".'Response: %s'."\n", date('Y-m-d H:i:s'), 'UNKNOWN ERROR', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json, $resultJSON), 3, BaseAPI::UNKNOWNS_LOG);
+					$this->callLog->critical('Non-successful call to QBank API and no specified error.', array(
+						'address' => $this->apiAddress.'/'.$this->qbankAddress.'/'.$function,
+						'request' => $json,
+						'response' => $resultJSON
+					));
 					throw new CommunicationException('Unknown error! Non-successful call to QBank API and no specified error. Please note the time and report this to support@kaigantbk.se', 99, 'UnknownError');
 				}
 			}
 			if ($log === true) {
-				error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->apiAddress.'/'.$this->qbankAddress.'/'.$function, $json), 3, BaseAPI::CALLS_LOG);
+				$this->callLog->notice('API call.', array(
+					'address' => $this->apiAddress.'/'.$this->qbankAddress.'/'.$function,
+					'request' => $json,
+					'response' => $resultJSON
+				));
+			} else {
+				$this->callLog->debug('API call.', array(
+					'address' => $this->apiAddress.'/'.$this->qbankAddress.'/'.$function,
+					'request' => $json,
+					'response' => $resultJSON
+				));
 			}
 			return $result;
 		}
@@ -243,6 +254,7 @@ abstract class BaseAPI {
 
 	protected function callAsync($function, array $data, $log = false) {
 		if (strtolower($function) == 'login') {
+			$this->wrapperLog->error('Login can not be called asynchronously!');
 			throw new APIException('Login can not be called asynchronously!');
 		}
 		if (!empty($this->hash)) {
@@ -251,6 +263,7 @@ abstract class BaseAPI {
 
 		$socket = fsockopen(parse_url($this->apiAddress, PHP_URL_HOST), 80, $errno, $errstr);
 		if ($socket === false) {
+			$this->wrapperLog->critical('Error while opening asynchronous socket: '.$errstr, array('code' => $errno));
 			throw new ConnectionException('Error while opening asynchronous socket: '.$errstr, $errno);
 		}
 
@@ -265,6 +278,7 @@ abstract class BaseAPI {
 
 		$result = fwrite($socket, $msg);
 		if ($result === false) {
+			$this->wrapperLog->critical('Error while writing to asycnhronous socket!');
 			throw new ConnectionException('Error while writing to asycnhronous socket!');
 		}
 		@fclose($socket);

@@ -75,6 +75,10 @@ class FolderAPI extends BaseAPI {
 		$calls[] = array('name' => 'folder', 'function' => 'getfolderinformation', 'arguments' => array('folderId' => $id));
 		$result = $this->call('batch', array('calls' => $calls));
 		if ($result->results->folder->success !== true) {
+			$this->wrapperLog->error('Error while getting folder: '.$result->results->folder->error->message, array(
+				'code' => $result->results->folder->error->code,
+				'type' => $result->results->folder->error->type
+			));
 			throw new CommunicationException($result->results->folder->error->message, $result->results->folder->error->code, $result->results->folder->error->type);
 		}
 		$folder = $result->results->folder->folder;
@@ -89,6 +93,10 @@ class FolderAPI extends BaseAPI {
 		}
 		if ($recursive === true) {
 			if ($result->results->subfolders->success !== true) {
+				$this->wrapperLog->error('Error while getting folder: '.$result->results->subfolders->error->message, array(
+					'code' => $result->results->subfolders->error->code,
+					'type' => $result->results->subfolders->error->type
+				));
 				throw new CommunicationException($result->results->subfolders->error->message, $result->results->subfolders->error->code, $result->results->subfolders->error->type);
 			}
 			if (is_array($result->results->subfolders->data)) {
@@ -152,9 +160,17 @@ class FolderAPI extends BaseAPI {
 		$calls[] = array('name' => 'folder', 'function' => 'getfolderinformation', 'arguments' => array('folderId' => '$creation.folderId'));
 		$result = $this->call('batch', array('calls' => $calls));
 		if ($result->results->creation->success !== true) {
+			$this->wrapperLog->error('Error while creating folder: '.$result->results->creation->error->message, array(
+				'code' => $result->results->creation->error->code,
+				'type' => $result->results->creation->error->type
+			));
 			throw new CommunicationException($result->results->creation->error->message, $result->results->creation->error->code, $result->results->creation->error->type);
 		}
 		if ($result->results->folder->success !== true) {
+			$this->wrapperLog->error('Error while creating folder: '.$result->results->folder->error->message, array(
+				'code' => $result->results->folder->error->code,
+				'type' => $result->results->folder->error->type
+			));
 			throw new CommunicationException($result->results->folder->error->message, $result->results->folder->error->code, $result->results->folder->error->type);
 		}
 		$folder = $result->results->folder->folder;
@@ -192,9 +208,17 @@ class FolderAPI extends BaseAPI {
 		$calls[] = array('name' => 'folder', 'function' => 'getfolderinformation', 'arguments' => array('folderId' => $folderId));
 		$result = $this->call('batch', array('calls' => $calls));
 		if ($result->results->edit->success !== true) {
+			$this->wrapperLog->error('Error while editing folder: '.$result->results->edit->error->message, array(
+				'code' => $result->results->edit->error->code,
+				'type' => $result->results->edit->error->type
+			));
 			throw new CommunicationException($result->results->edit->error->message, $result->results->edit->error->code, $result->results->edit->error->type);
 		}
 		if ($result->results->folder->success !== true) {
+			$this->wrapperLog->error('Error while editing folder: '.$result->results->folder->error->message, array(
+				'code' => $result->results->folder->error->code,
+				'type' => $result->results->folder->error->type
+			));
 			throw new CommunicationException($result->results->folder->error->message, $result->results->folder->error->code, $result->results->folder->error->type);
 		}
 		$folder = $result->results->folder->folder;
@@ -220,6 +244,7 @@ class FolderAPI extends BaseAPI {
 			if ($ce->getCode() == 99) {
 				return false;
 			}
+			$this->wrapperLog->error('Error while adding object to folder: '.$ce->getMessage());
 			throw $ce;
 		}
 	}
@@ -243,6 +268,7 @@ class FolderAPI extends BaseAPI {
 			if ($ce->getCode() == 99) {
 				return false;
 			}
+			$this->wrapperLog->error('Error while removing object from folder: '.$ce->getMessage());
 			throw $ce;
 		}
 	}

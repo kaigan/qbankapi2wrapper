@@ -61,17 +61,17 @@ class ObjectAPI extends BaseAPI {
 		@ob_end_clean();
 		$realPath = realpath($pathToFile);
 		if ($realPath === false) {
-			error_log(sprintf('Error while trying to force download of the path %s with the name %s. It is not a file!', $pathToFile, $filename));
+			$this->wrapperLog->error('Error while trying to force download. Not a real path.', array('path' => $pathToFile, 'filename' => $filename));
 			return false;
 		} else {
 			$pathToFile = $realPath;
 		}
 		if (!is_file($pathToFile)) {
-			error_log(sprintf('Error while trying to force download of the path %s with the name %s. It is not a file!', $pathToFile, $filename));
+			$this->wrapperLog->error('Error while trying to force download. Not a file.', array('path' => $pathToFile, 'filename' => $filename));
 			return false;
 		}
 		if (connection_status() != 0) {
-			error_log(sprintf('Error while trying to force download of the path %s with the name %s. No connection to client!', $pathToFile, $filename));
+			$this->wrapperLog->error('Error while trying to force download. No connection to client.', array('path' => $pathToFile, 'filename' => $filename));
 			return false;
 		}
 		set_time_limit(0);
@@ -82,7 +82,7 @@ class ObjectAPI extends BaseAPI {
 
 		header('Content-Disposition: attachment; filename="'.$filename.'"');
 		header('Content-Type: '.$mimetype);
-		error_log("$realPath");
+		$this->wrapperLog->debug('Forced download.', array('path' => $pathToFile, 'filename' => $filename, 'mimetype' => $mimetype));
 		header('X-SendFile: '.$realPath);
 		die;
 
@@ -439,7 +439,9 @@ class ObjectAPI extends BaseAPI {
 				if (is_a($property, 'PropertyBase')) {
 					$props[$property->getSystemName()] = $property->getValue();
 				} else {
-					error_log(sprintf('[%s] (%s) %s: %s'."\n",date('Y-m-d H:i:s'), 'INFO', $this->qbankAddress.'/'.$function, 'Skipping bad value '.@strval($property)), 3, QBankAPI::CALLS_LOG);
+					$this->wrapperLog->warning('Skipping bad property during preparation.', array(
+						'value' => @strval($property)
+					));
 				}
 			}
 			return $props;
