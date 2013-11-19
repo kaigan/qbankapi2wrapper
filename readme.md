@@ -4,9 +4,11 @@
 QBankAPI2Wrapper is a library that makes it easy to use the QBank API2 directly from PHP. No need to handle the connections or interpreting the results yourself. QBankAPI2Wrapper also provides classes with metods for the most commonly used functions.
 
 ## Installation
-When you have obtained the source files you need to make them accessible for your scripts. QBankAPI2Wrapper is designed to be put in a place where it is included in php.ini's `include_path`. This is to make it easy to use as a library. It is also possible to place QBankAPI2Wrapper in the same folder as the executing script, although it is not intended.
+Install via composer.
 
-QBankAPI2Wrapper will try to log to the directory `/var/log/qbankapiwrapper`, so make sure that the folder exists and is writable by the php process.
+	"require": {
+		"kaigan/qbankapi2wrapper": "v1.3.*"
+    }
 
 ## Class library
 A class library is available at [http://tools.kaigantbk.se/docs/docs/QBankAPI2Wrapper/](http://tools.kaigantbk.se/docs/docs/QBankAPI2Wrapper/) or in PDF form upon request.
@@ -55,6 +57,10 @@ If there is a need to instantiate several API-classes (there often is), please r
 			// Save the session hash somewhere
 		}
 	?>
+
+### Logging
+QBankAPI2Wrapper utilizes Monolog and has a default `Monolog\Handler\ErrorLogHandler` to allow you to see most messages in your default error log for PHP.
+If needed you may push other handlers via the `BaseAPI->addLogHandler()` method.
 
 ### Search
 Searching is the primary way to retrive more then one object from QBank. There are several ways to conduct a search, and the preffered way to do it depends on the cirumstances.
