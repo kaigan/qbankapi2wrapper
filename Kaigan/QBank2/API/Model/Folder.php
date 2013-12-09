@@ -202,11 +202,11 @@ class Folder extends SimpleFolder implements IHasProperties {
 	 * @return array An array of top level {@link Folder}s.
 	 */
 	public static function createTree(array $folders) {
-		usort($folders, array('SimpleFolder', 'compareByTree'));
+		usort($folders, array('Kaigan\QBank2\API\Model\SimpleFolder', 'compareByTree'));
 		$tree = array();
 		$shortestTree = Folder::getShortestTree($folders);
 		foreach ($folders as $folder) {
-			if (@get_class($folder) == 'SimpleFolder') {
+			if (@get_class($folder) == 'Kaigan\QBank2\API\Model\SimpleFolder') {
 				$folder = Folder::createFromSimpleFolder($folder);
 			}
 			try {
@@ -296,9 +296,8 @@ class Folder extends SimpleFolder implements IHasProperties {
 		$depth = null;
 		$tree;
 		foreach ($folders as $folder) {
-			if (@get_class($folder) == 'Folder') {
-				$currentTree = explode('-', $folder->getTree());
-				$currentTree = array_filter($currentTree);
+			if ($folder instanceof Folder) {
+				$currentTree = array_filter(explode('-', $folder->getTree()));
 				if ($depth == null) {
 					$depth = count($currentTree);
 					$tree = $folder->getTree();
