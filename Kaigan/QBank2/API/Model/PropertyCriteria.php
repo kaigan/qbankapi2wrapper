@@ -83,7 +83,7 @@ class PropertyCriteria {
 	 * @return bool True if they are equal, false if not.
 	 */
 	public function equals($var) {
-		if (!is_a($var, 'PropertyCriteria')) {
+		if (!($var instanceof PropertyCriteria)) {
 			return false;
 		}
 		if ($var->getSystemName() != $this->systemName) {

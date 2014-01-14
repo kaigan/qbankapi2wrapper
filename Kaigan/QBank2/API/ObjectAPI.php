@@ -10,6 +10,7 @@ use \Kaigan\QBank2\API\Model\Category;
 use \Kaigan\QBank2\API\Model\DeploymentSite;
 use \Kaigan\QBank2\API\Model\ImageTemplate;
 use \Kaigan\QBank2\API\Model\Object;
+use \Kaigan\QBank2\API\Model\PropertyBase;
 use \Kaigan\QBank2\API\Model\PropertyType;
 use \stdClass;
 	
@@ -436,7 +437,7 @@ class ObjectAPI extends BaseAPI {
 		if (is_array($properties)) {
 			$props = array();
 			foreach ($properties as $property) {
-				if (is_a($property, 'PropertyBase')) {
+				if ($property instanceof PropertyBase) {
 					$props[$property->getSystemName()] = $property->getValue();
 				} else {
 					$this->wrapperLog->warning('Skipping bad property during preparation.', array(

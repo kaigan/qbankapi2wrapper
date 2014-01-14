@@ -20,7 +20,7 @@ abstract class BaseAPI {
 	 * The version of QBankAPIWrapper.
 	 * @var string
 	 */
-	const VERSION = '1.3.1';
+	const VERSION = '1.3.2';
 
 	protected $apiAddress;
 	protected $qbankAddress;
