@@ -7,7 +7,7 @@ QBankAPI2Wrapper is a library that makes it easy to use the QBank API2 directly 
 Install via composer.
 
 	"require": {
-		"kaigan/qbankapi2wrapper": "v1.3.*"
+		"kaigan/qbankapi2wrapper": "~1.3"
     }
 
 ## Class library
