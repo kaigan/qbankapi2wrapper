@@ -431,10 +431,10 @@ class Search {
 	 */
 	public function addPropertyCriterias(array $criterias) {
 		foreach ($criterias as $criteria) {
-			if (get_class($criteria) == 'PropertyCriteria' || is_subclass_of($criteria, 'PropertyCriteria')) {
+			if ($criteria instanceof PropertyCriteria) {
 				$this->addPropertyCriteria($criteria);
 			} else {
-				trigger_error('Skipping value: '.$criteria.'. Not a valid PropertyCriteria! ('.get_class($criteria).')');
+				trigger_error('Skipping value: '.(string)$criteria.'. Not a valid PropertyCriteria! ('.get_class($criteria).')');
 			}
 		}
 	}

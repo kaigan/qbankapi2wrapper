@@ -158,7 +158,7 @@ class SearchResult implements ArrayAccess, Iterator, Countable {
 	 * @return void
 	 */
 	public function offsetSet($offset, $value) {
-		if (@get_class($value) == 'SimpleObject' || @is_subclass_of($value, 'SimpleObject') === true) {
+		if ($value instanceof SimpleObject) {
 			if (is_null($offset)) {
 				$this->results[$this->count++] = $value;
 			}

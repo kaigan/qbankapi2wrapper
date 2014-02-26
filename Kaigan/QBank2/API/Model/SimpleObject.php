@@ -382,7 +382,7 @@ class SimpleObject implements IHasProperties {
 	 */
 	protected function addProperties(array $properties) {
 		foreach ($properties as $property) {
-			if (@get_class($property) == 'Property') {
+			if ($property instanceof Property) {
 				$this->addProperty($property);
 			}
 		}

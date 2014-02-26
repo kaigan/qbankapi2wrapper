@@ -61,7 +61,7 @@ class SearchAPI extends BaseAPI {
 		}
 		if (isset($properties) && is_array($properties)) {
 			foreach ($properties as $property) {
-				if (@get_class($property) == 'PropertyCriteria' && $property->getSystemName() != 'system_media_status') {
+				if ($property instanceof PropertyCriteria && $property->getSystemName() != 'system_media_status') {
 					$data['properties'][] = array('name' => $property->getSystemName(), 'value' => $property->getValue(),
 												  'operator' => $property->getOperator(), 'forfetching' => $property->isForFetching());
 				}

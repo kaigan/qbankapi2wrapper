@@ -68,7 +68,7 @@ class Folder extends SimpleFolder implements IHasProperties {
 	 */
 	protected function addChildren(array $children) {
 		foreach ($children as $child) {
-			if (@get_class($child) == 'Folder') {
+			if ($child instanceof Folder) {
 				$this->addChild($child);
 			}
 		}
@@ -128,7 +128,7 @@ class Folder extends SimpleFolder implements IHasProperties {
 	 */
 	protected function addProperties(array $properties) {
 		foreach ($properties as $property) {
-			if (@get_class($property) == 'Property') {
+			if ($property instanceof Property) {
 				$this->addProperty($property);
 			}
 		}
@@ -206,7 +206,7 @@ class Folder extends SimpleFolder implements IHasProperties {
 		$tree = array();
 		$shortestTree = Folder::getShortestTree($folders);
 		foreach ($folders as $folder) {
-			if (@get_class($folder) == 'Kaigan\QBank2\API\Model\SimpleFolder') {
+			if ($folder instanceof SimpleFolder) {
 				$folder = Folder::createFromSimpleFolder($folder);
 			}
 			try {
