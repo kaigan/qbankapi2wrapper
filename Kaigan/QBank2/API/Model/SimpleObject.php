@@ -329,7 +329,7 @@ class SimpleObject implements IHasProperties {
 			return $this->properties;
 		}
 		$properties = array();
-		foreach ($identifiers as $identfier) {
+		foreach ($identifiers as $identifier) {
 			try {
 				$property = $this->getProperty($identifier);
 				$properties[$property->getSystemName()] = $property;
