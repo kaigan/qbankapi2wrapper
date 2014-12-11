@@ -5,8 +5,8 @@ namespace Kaigan\QBank2\API;
 use \Kaigan\QBank2\API\Exception\APIException;
 use \Kaigan\QBank2\API\Exception\CommunicationException;
 use \Kaigan\QBank2\API\Exception\ConnectionException;
-use \Monolog\Handler\AbstractHandler;
 use \Monolog\Handler\ErrorLogHandler;
+use Monolog\Handler\HandlerInterface;
 use \Monolog\Logger;
 	
 /**
@@ -20,7 +20,7 @@ abstract class BaseAPI {
 	 * The version of QBankAPIWrapper.
 	 * @var string
 	 */
-	const VERSION = '1.3.3';
+	const VERSION = '1.3.4';
 
 	protected $apiAddress;
 	protected $qbankAddress;
@@ -88,7 +88,7 @@ abstract class BaseAPI {
 		$this->hash = $hash;
 	}
 	
-	public function addLogHandler(Monolog\Handler\AbstractHandler $handler) {
+	public function addLogHandler(HandlerInterface $handler) {
 		$this->callLog->pushHandler($handler);
 		$this->wrapperLog->pushHandler($handler);
 	}
