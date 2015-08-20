@@ -183,9 +183,14 @@ abstract class BaseAPI {
 				$this->wrapperLog->critical('Error while uploading. The supplied path is not readable!', array('path' => $path));
 				throw new APIException('The supplied path "'.$pathToFile.'" is not readable!');
 			}
+			if (function_exists('curl_file_create')) { // PHP 5.5+
+				$file = curl_file_create($path);
+			} else {
+				$file = '@'.$path;
+			}
 			$data = array(
 				'data' => $json,
-				'file' => '@'.$path
+				'file' => $file
 			);
 		} else {
 			$data = array(
